@@ -40,6 +40,14 @@ require('lazy').setup({
   {'nvim-lualine/lualine.nvim'},
   {'nvim-treesitter/nvim-treesitter'},
   {'nvim-telescope/telescope.nvim'},
+
+-- lsp
+    {"williamboman/mason.nvim"}, -- manage external LSP servers, DAP servers, linters, and formatters
+    {"williamboman/mason-lspconfig.nvim"},
+    {"neovim/nvim-lspconfig"},
+
+    -- {""},
+
 })
 
 -- color scheme
