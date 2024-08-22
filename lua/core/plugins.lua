@@ -29,7 +29,13 @@ require('lazy').setup({
   -- List of plugins:  
 
   --color scheme(s)
-  {'folke/tokyonight.nvim'},
+  {'folke/tokyonight.nvim',
+	lazy = false,
+	priority = 1000,
+	config = function()
+		vim.cmd([[colorscheme tokyonight]])
+	end
+  },
   {'doums/darcula'},
 
   -- status bar / line 
@@ -68,14 +74,24 @@ require('lazy').setup({
 
   {"saadparwaiz1/cmp_luasnip"},
   {"rafamadriz/friendly-snippets"},
-  -- {""},
+
+-- Autocompletion - AI / LLM
+{
+    "Exafunction/codeium.nvim",
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        "hrsh7th/nvim-cmp",
+    },
+    config = function()
+        require("codeium").setup({
+        })
+    end
+},
+
 
 })
 
--- color scheme
-vim.opt.termguicolors = true
-vim.cmd.colorscheme('tokyonight')
--- vim.cmd.colorscheme('darcula')
+
 
 ---
 -- lsp zero config

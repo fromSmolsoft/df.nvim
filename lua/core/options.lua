@@ -1,18 +1,34 @@
+-- DRY: Local variable for `vim.opt`, `vim.cmd`, etc. 
+--  so it doesn't have to be repeated everytime
 
--- terminal colors
-vim.opt.termguicolors = true
+local opt  = vim.opt
+local cmd  = vim.cmd
+
+-- opt.clipboard = "unnamed,unnamedplus"
+
+
+-- color scheme (terminal colors required!)
+opt.termguicolors = true
+
+-- cmd.colorscheme('tokyonight')
+-- cmd.colorscheme('darcula')
+
+
+opt.number = true
+opt.relativenumber = true
+
 
 -- backspace
-vim.opt.backspace = '2'
+opt.backspace = '2'
 
-vim.opt.showcmd = true
-vim.opt.laststatus = 2
-vim.opt.autowrite = true
-vim.opt.cursorline = true
-vim.opt.autoread = true
+opt.showcmd = true
+opt.laststatus = 2
+opt.autowrite = true
+opt.cursorline = true
+opt.autoread = true
 
 -- use spaces for tabs
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.shiftround = true
-vim.opt.expandtab = true
+opt.tabstop = 4
+opt.shiftwidth = 4
+opt.shiftround = true
+opt.expandtab = true

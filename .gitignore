@@ -1,2 +1,12 @@
 # lazy-lock.json contains exact state of plugins, will be generated on any new configuration automatically
 lazy-lock.json
+
+# vim
+
+# nvim
+*.swp
+
+# Linux
+
+# Windows
+
