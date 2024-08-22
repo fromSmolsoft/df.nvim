@@ -40,6 +40,9 @@ require('lazy').setup({
   {'nvim-tree/nvim-web-devicons'},
   {'nvim-telescope/telescope.nvim'},
 
+  -- VCS
+  {'mhinz/vim-signify'},
+
   -- syntax highlight
   {'nvim-treesitter/nvim-treesitter'},
 
@@ -53,6 +56,8 @@ require('lazy').setup({
   -- Autocompletion
   {'hrsh7th/cmp-nvim-lsp'},
   {'hrsh7th/nvim-cmp'},
+
+  -- Autocompletion - snippets
 {
 	"L3MON4D3/LuaSnip",
 	-- follow latest release.
@@ -61,7 +66,8 @@ require('lazy').setup({
 	build = "make install_jsregexp"
 },
 
-
+  {"saadparwaiz1/cmp_luasnip"},
+  {"rafamadriz/friendly-snippets"},
   -- {""},
 
 })

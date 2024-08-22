@@ -1,6 +1,7 @@
 
+-- terminal colors
 vim.opt.termguicolors = true
- 
+
 -- backspace
 vim.opt.backspace = '2'
 
