@@ -1,11 +1,11 @@
+
 -- DRY: Local variable for `vim.opt`, `vim.cmd`, etc. 
 --  so it doesn't have to be repeated everytime
 
 local opt  = vim.opt
 local cmd  = vim.cmd
 
--- opt.clipboard = "unnamed,unnamedplus"
-
+-- opt.clipboard = "unnamed,unnamedplus" -- todo: fix, crashes config
 
 -- color scheme (terminal colors required!)
 opt.termguicolors = true
@@ -13,10 +13,8 @@ opt.termguicolors = true
 -- cmd.colorscheme('tokyonight')
 -- cmd.colorscheme('darcula')
 
-
 opt.number = true
 opt.relativenumber = true
-
 
 -- backspace
 opt.backspace = '2'
