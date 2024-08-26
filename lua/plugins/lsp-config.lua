@@ -2,8 +2,10 @@ return {
     {
         "williamboman/mason.nvim",
         lazy = false,
+        opts = { ensure_installed = { "java-debug-adapter, java-test" } },
         config = function()
-            require("mason").setup()
+            require("mason").setup({
+            })
         end,
     },
     {
@@ -20,22 +22,37 @@ return {
             local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
             local lspconfig = require("lspconfig")
-            lspconfig.jdtls.setup({
-                capabilities = capabilities
-            })
-            lspconfig.tsserver.setup({
-                capabilities = capabilities
-            })
-            lspconfig.solargraph.setup({
-                capabilities = capabilities
-            })
-            lspconfig.html.setup({
-                capabilities = capabilities
-            })
+            -- todo: fix lua_ls starts / fails randomly
             lspconfig.lua_ls.setup({
                 capabilities = capabilities
             })
 
+            -- lspconfig.java.setup({
+            --     capabilities = capabilities })
+
+            lspconfig.jdtls.setup({
+                jdtls = function ()
+                    return true
+                end,
+            })
+
+            lspconfig.pyright.setup({
+                capabilities = capabilities
+            })
+
+            lspconfig.tsserver.setup({
+                capabilities = capabilities
+            })
+
+            lspconfig.solargraph.setup({
+                capabilities = capabilities
+            })
+
+            lspconfig.html.setup({
+                capabilities = capabilities
+            })
+
+            vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, {})
             vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
             vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
             vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, {})
