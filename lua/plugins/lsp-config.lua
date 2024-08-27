@@ -31,7 +31,7 @@ return {
             --     capabilities = capabilities })
 
             lspconfig.jdtls.setup({
-                jdtls = function ()
+                jdtls = function()
                     return true
                 end,
             })
@@ -52,11 +52,11 @@ return {
                 capabilities = capabilities
             })
 
-            vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, {})
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
-            vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
-            vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, {})
-            vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {})
+            vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
+            vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
+            vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {desc = "Definition"})
+            vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, {desc = "Reference"})
+            vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {desc = "Code action"})
         end,
     },
 }
