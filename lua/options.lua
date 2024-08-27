@@ -5,7 +5,7 @@
 local opt  = vim.opt
 local cmd  = vim.cmd
 
--- opt.clipboard = "unnamed,unnamedplus" -- todo: fix, crashes config
+opt.clipboard = "unnamedplus" -- todo: fix, crashes config
 
 -- color scheme (terminal colors required!)
 opt.termguicolors = true
