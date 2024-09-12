@@ -5,7 +5,8 @@
 local opt  = vim.opt
 local cmd  = vim.cmd
 
-opt.clipboard = "unnamedplus" -- todo: fix, crashes config
+-- copy/paste
+opt.clipboard = "unnamedplus"
 
 -- color scheme (terminal colors required!)
 opt.termguicolors = true
@@ -30,3 +31,8 @@ opt.tabstop = 4
 opt.shiftwidth = 4
 opt.shiftround = true
 opt.expandtab = true
+
+-- spellcheck
+opt.spelllang = {'en_us', 'en_gb', 'cs'}
+opt.spell = true
+
