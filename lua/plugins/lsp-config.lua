@@ -35,17 +35,20 @@ return {
 				end,
 			})
 
+            -- ls c, c++, rust, go, java, python, c#, javascript, jsx, typescript, html, css, kotlin, dart, lua
 			lspconfig.ast_grep.setup({
 				capabilities = capabilities,
 			})
 
-			lspconfig.tsserver.setup({
+            -- Typescript ls
+			lspconfig.ts_ls.setup({
 				capabilities = capabilities,
 			})
 
-			lspconfig.solargraph.setup({
-				capabilities = capabilities,
-			})
+            -- Ruby inteli sense ls
+            -- lspconfig.solargraph.setup({
+        	-- 	capabilities = capabilities,
+			-- })
 
 			lspconfig.html.setup({
 				capabilities = capabilities,
