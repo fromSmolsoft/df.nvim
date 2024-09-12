@@ -13,4 +13,14 @@ return {
             auto_clean_after_session_restore = true, -- Automatically clean up broken neo-tree buffers saved in sessions
         }
     end,
+
+    -- todo: Automatically close Neotree - doesn't work
+    -- commands = {
+    --     open_nofocus = function (state)
+    --         require("neo-tree.sources.filesystem.commands").open(state)
+    --         vim.schedule(function ()
+    --             vim.cmd([[Neotree close]])
+    --         end)
+    --     end,
+    -- }
 }
