@@ -5,6 +5,7 @@ lazy-lock.json
 
 # nvim
 *.swp
+*.spl
 
 # Linux
 
