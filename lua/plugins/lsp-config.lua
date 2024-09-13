@@ -26,6 +26,9 @@ return {
 				capabilities = capabilities,
 			})
 
+            lspconfig.marksman.setup({
+                capabilities = capabilities,
+            })
 			-- lspconfig.java.setup({
 			--     capabilities = capabilities })
 
