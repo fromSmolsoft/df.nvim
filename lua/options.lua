@@ -6,7 +6,7 @@ local opt  = vim.opt
 local cmd  = vim.cmd
 
 -- copy/paste
-opt.clipboard = "unnamedplus"
+opt.clipboard="unnamed,unnamedplus"
 
 -- color scheme (terminal colors required!)
 opt.termguicolors = true
