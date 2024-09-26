@@ -2,7 +2,7 @@ return {
     {
         "nvim-treesitter/nvim-treesitter",
         build = ":TSUpdate",
-        opts = { ensure_installed = {"lua", "java", "html", "vim", "vimdoc", "bash", "javascript" } },
+        opts = { ensure_installed = {"lua", "java", "html", "vim", "vimdoc", "bash", "javascript", "python", "xml" } },
         config = function()
             local config = require("nvim-treesitter.configs")
             config.setup({
