@@ -11,7 +11,10 @@ return {
                 -- formatting
                 null_ls.builtins.formatting.stylua, -- lua
                 null_ls.builtins.formatting.prettier, -- angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
-                null_ls.builtins.formatting.rubocop, -- ruby
+
+                null_ls.builtins.formatting.shellharden, -- bash                
+
+                -- null_ls.builtins.formatting.rubocop, -- ruby
                 null_ls.builtins.formatting.black, -- python
 
 
