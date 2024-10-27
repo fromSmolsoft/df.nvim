@@ -1,15 +1,19 @@
 return {
-	-- todo: fix
-	"Exafunction/codeium.nvim",
-	dependencies = {
-		"nvim-lua/plenary.nvim",
-		"hrsh7th/nvim-cmp",
-	},
-	cmd = "Codeium",
-	build = ":Codeium Auth",
-	opts = {},
+    -- todo: fix
+    "Exafunction/codeium.nvim",
 
-	config = function()
-		require("codeium").setup({})
-	end,
+    -- enable / disable plugin
+    enabled = false,
+
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        "hrsh7th/nvim-cmp",
+    },
+    cmd = "Codeium",
+    build = ":Codeium Auth",
+    opts = {},
+
+    config = function()
+        require("codeium").setup({})
+    end,
 }
