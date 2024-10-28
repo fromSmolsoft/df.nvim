@@ -84,6 +84,10 @@ return {
             vim.keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
             vim.keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
             vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+
+            -- Show line diagnostics automatically in hover window
+            vim.o.updatetime = 250
+            vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
         end,
     },
 }
