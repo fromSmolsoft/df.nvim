@@ -1,6 +1,6 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
--- Auto instal lazy.nvim plugin manager
+-- Auto install lazy.nvim plugin manager
 if not vim.loop.fs_stat(lazypath) then
     vim.fn.system({
         "git",
