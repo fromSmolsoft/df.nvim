@@ -38,10 +38,11 @@ return {
                 end,
             })
 
-            -- ls c, c++, rust, go, java, python, c#, javascript, jsx, typescript, html, css, kotlin, dart, lua
-            lspconfig.ast_grep.setup({
-                capabilities = capabilities,
-            })
+            -- lspconfig.ast_grep.setup({
+            -- -- ls c, c++, rust, go, java, python, c#, javascript, jsx, typescript, html, css, kotlin, dart, lua
+            -- -- requires config per project
+            --     capabilities = capabilities,
+            -- })
 
             -- Typescript ls
             lspconfig.ts_ls.setup({
@@ -68,8 +69,19 @@ return {
             lspconfig.powershell_es.setup({
                 capabilities = capabilities,
             })
+
             lspconfig.pyright.setup({
                 capabilities = capabilities,
+            })
+
+            lspconfig.ruff.setup({
+                -- trows error for whatever reason
+                -- capabilities = capabilities, 
+                init_options = {
+                    settings = {
+                        -- Ruff language server settings go here
+                    }
+                }
             })
 
             -- xml
