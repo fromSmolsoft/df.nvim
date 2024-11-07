@@ -1,7 +1,9 @@
 return {
     'windwp/nvim-autopairs',
     event = "InsertEnter",
-    config = true
-    -- use opts = {} for passing setup options
-    -- this is equivalent to setup({}) function
+    config = function()
+        require("nvim-autopairs").setup({
+            disable_filetype = { "TelescopePrompt", "vim" },
+        })
+    end,
 }

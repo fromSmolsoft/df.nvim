@@ -35,15 +35,16 @@ return {
                 sources = cmp.config.sources({
                         { name = "nvim_lsp" },
                         { name = "luasnip" }, -- For luasnip users.
+                        { name = 'nvim_lsp_signature_help' },
                     },
                     { { name = "buffer" }, }),
             })
         end,
         dependencies = {
-
+            "hrsh7th/cmp-nvim-lsp-signature-help",
             -- AI autocomplete
 
-            -- defined in codeium.lua 
+            -- defined in codeium.lua
             -- {
             --     "Exafunction/codeium.nvim",
             --     enabled = false,
