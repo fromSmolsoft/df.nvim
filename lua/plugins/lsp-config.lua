@@ -75,13 +75,13 @@ return {
             })
 
             lspconfig.ruff.setup({
-                -- trows error for whatever reason
-                -- capabilities = capabilities, 
+                -- TODO: FIX: buff received invalid settings, falling back to default settings
+                capabilities = capabilities,
                 init_options = {
                     settings = {
                         -- Ruff language server settings go here
                     }
-                }
+                },
             })
 
             -- xml
