@@ -42,14 +42,6 @@ return {
         end,
         dependencies = {
             "hrsh7th/cmp-nvim-lsp-signature-help",
-            -- AI autocomplete
-
-            -- defined in codeium.lua
-            -- {
-            --     "Exafunction/codeium.nvim",
-            --     enabled = false,
-            --     opts = { enable_chat = true, },
-            -- },
         },
     },
 }
