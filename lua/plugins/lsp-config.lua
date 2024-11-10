@@ -90,7 +90,7 @@ return {
             -- 	capabilities = capabilities,
             -- })
 
-            vim.keymap.set("n", "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
+            vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
             vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
             vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
             vim.keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
