@@ -98,13 +98,28 @@ return {
 
     {
         -- Show doc strings upon hover
-        -- FIX: Hover doesn't show doc-string, status bar writes "No information available"  
+        -- FIX: Hover doesn't show doc-string, status bar writes "No information available"
         "ray-x/lsp_signature.nvim",
         enabled = true,
         event = "VeryLazy",
         opts = {},
         config = function(_, opts)
-            require 'lsp_signature'.setup(opts)
+            require "lsp_signature".setup(opts)
         end,
+
+        -- load on lsp buffer attaching
+        -- FIX: trows error Attempt to get length of local 'spec' 
+        -- vim.api.nvim_create_autocmd("LspAttach", {
+        --     callback = function(args)
+        --         local bufnr = args.buf
+        --         local client = vim.lsp.get_client_by_id(args.data.client_id)
+        --         if vim.tbl_contains({ 'null-ls' }, client.name) then -- blacklist lsp
+        --             return
+        --         end
+        --         require("lsp_signature").on_attach({
+        --             -- ... setup options here ...
+        --         }, bufnr)
+        --     end,
+        -- })
     },
 }
