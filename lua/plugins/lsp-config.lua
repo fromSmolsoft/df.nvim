@@ -21,7 +21,7 @@ return {
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
             local lspconfig = require("lspconfig")
-            -- todo: fix lua_ls starts / fails randomly
+
             lspconfig.lua_ls.setup({
                 capabilities = capabilities,
             })
@@ -37,12 +37,6 @@ return {
                     return true
                 end,
             })
-
-            -- lspconfig.ast_grep.setup({
-            -- -- ls c, c++, rust, go, java, python, c#, javascript, jsx, typescript, html, css, kotlin, dart, lua
-            -- -- requires config per project
-            --     capabilities = capabilities,
-            -- })
 
             -- Typescript ls
             lspconfig.ts_ls.setup({
@@ -71,11 +65,13 @@ return {
             })
 
             lspconfig.pyright.setup({
+                -- python
                 capabilities = capabilities,
             })
 
             lspconfig.ruff.setup({
-                -- TODO: FIX: buff received invalid settings, falling back to default settings
+                -- python
+                -- FIX: buff received invalid settings, falling back to default settings
                 capabilities = capabilities,
                 init_options = {
                     settings = {
@@ -83,12 +79,6 @@ return {
                     }
                 },
             })
-
-            -- xml
-            -- todo: fix: "Cannot access configuration for ... . Ensure this server is listed in server_configurations.md or added as a custom server."
-            -- lspconfig.xmlformat.setup({
-            -- 	capabilities = capabilities,
-            -- })
 
             vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
             vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
@@ -107,10 +97,14 @@ return {
     },
 
     {
+        -- Show doc strings upon hover
+        -- FIX: Hover doesn't show doc-string, status bar writes "No information available"  
         "ray-x/lsp_signature.nvim",
-        enabled = false,
+        enabled = true,
         event = "VeryLazy",
         opts = {},
-        config = function(_, opts) require 'lsp_signature'.setup(opts) end
+        config = function(_, opts)
+            require 'lsp_signature'.setup(opts)
+        end,
     },
 }
