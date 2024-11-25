@@ -100,6 +100,16 @@ return {
                 capabilities = capabilities,
             })
 
+            -- lspconfig.groovyls.setup({
+            --     capabilities = capabilities,
+            -- })
+
+            lspconfig.gradle_ls.setup({
+                -- Gradle ls https://github.com/microsoft/vscode-gradle
+                -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#gradle_ls
+                capabilities = capabilities,
+            })
+
             vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
             vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
             vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
@@ -107,19 +117,40 @@ return {
             vim.keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
             vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
 
-            -- Show line diagnostics automatically in hover window
-            vim.o.updatetime = 250
-            vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
+            -- configure lsp line diagnostics
             vim.diagnostic.config({
                 severity_sort = true,
+                virtual_text = false,
+                signs = true,
+                underline = true,
+                float = {
+                    source = "if_many"
+                }
             })
+
+            -- toggle diagnostics
+            vim.keymap.set('n', '<leader>td', function()
+                    if vim.diagnostic.is_enabled() then
+                        vim.diagnostic.enable(false)
+                        vim.diagnostic.reset()
+
+                        -- Show line diagnostics automatically in hover window
+                        vim.o.updatetime = 250
+                        vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
+
+                        vim.notify("diagnostics disabled") --print to status bar
+                    else
+                        vim.diagnostic.enable(true)
+                        vim.notify("diagnostics enabled")
+                    end
+                end,
+                -- { silent = true, noremap = true },
+                { desc = "disgnostic toogle" })
         end,
     },
-
     {
-        -- Show doc strings upon hover
+        "ray-x/lsp_signature.nvim", -- Show doc strings upon hover
         -- FIX: Hover doesn't show doc-string, status bar writes "No information available"
-        "ray-x/lsp_signature.nvim",
         enabled = true,
         -- event = "VeryLazy",
         opts = {},
@@ -143,9 +174,7 @@ return {
         -- })
     },
     {
-        -- provides hook for non-lsp tools to hook into its lsp client (linters,formatters,..)
-        "nvimtools/none-ls.nvim",
-
+        "nvimtools/none-ls.nvim", -- provides hook for non-lsp tools to hook into its lsp client (linters,formatters,..)
         dependencies = {
             "nvim-lua/plenary.nvim",
         },
@@ -156,16 +185,10 @@ return {
                     -- formatting
                     -- null_ls.builtins.formatting.stylua, -- lua
                     null_ls.builtins.formatting.prettier,    -- angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
-
                     null_ls.builtins.formatting.shellharden, -- bash
-
-                    -- null_ls.builtins.formatting.rubocop, -- ruby
-                    -- null_ls.builtins.formatting.black, -- python
-
+                    null_ls.builtins.formatting.shfmt,       -- bash
                     -- diagnostics
-                    -- null_ls.builtins.diagnostics.erb_lint, -- html, ruby
-                    -- null_ls.builtins.diagnostics.rubocop, -- ruby
-
+                    -- null_ls.builtins.diagnostics.npm_groovy_lint, -- groovy
                 },
             })
 
