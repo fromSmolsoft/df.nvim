@@ -67,11 +67,13 @@ return {
                 -- python
                 -- FIX: buff received invalid settings, falling back to default settings
                 capabilities = capabilities,
-                init_options = {
-                    settings = {
-                        -- Ruff language server settings go here
-                    }
-                },
+
+                -- init_options = {
+                --     settings = {
+                --         -- Ruff language server settings go here
+                --         -- Shows warning about invalid config. if empty
+                --     }
+                -- },
             })
 
             lspconfig.ts_ls.setup({
@@ -129,23 +131,23 @@ return {
             })
 
             -- toggle diagnostics
-            vim.keymap.set('n', '<leader>td', function()
-                    if vim.diagnostic.is_enabled() then
-                        vim.diagnostic.enable(false)
-                        vim.diagnostic.reset()
+            local function togle_diagnostics()
+                if vim.diagnostic.is_enabled() then
+                    vim.diagnostic.enable(false)
+                    vim.diagnostic.reset()
 
-                        -- Show line diagnostics automatically in hover window
-                        vim.o.updatetime = 250
-                        vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
+                    -- Show line diagnostics automatically in hover window
+                    vim.o.updatetime = 250
+                    vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
 
-                        vim.notify("diagnostics disabled") --print to status bar
-                    else
-                        vim.diagnostic.enable(true)
-                        vim.notify("diagnostics enabled")
-                    end
-                end,
-                -- { silent = true, noremap = true },
-                { desc = "disgnostic toogle" })
+                    vim.notify("diagnostics disabled") --print to status bar
+                else
+                    vim.diagnostic.enable(true)
+                    vim.notify("diagnostics enabled")
+                end
+            end
+
+            vim.keymap.set('n', '<leader>td', togle_diagnostics, { desc = "disgnostic toogle" })
         end,
     },
     {
@@ -189,7 +191,7 @@ return {
                     null_ls.builtins.formatting.shfmt,       -- bash
 
                     -- diagnostics
-                    null_ls.builtins.diagnostics.npm_groovy_lint, -- groovy
+                    null_ls.builtins.diagnostics.npm_groovy_lint.with({ filetypes = { "groovy", "Jenkinsfile" } }), -- groovy, FIX: stop suggestion to remove semicolons from all java lines
                     -- null_ls.builtins.diagnostics.shellcheck,      -- deprecated,  bash
 
                     --code_actions
