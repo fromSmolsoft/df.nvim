@@ -187,8 +187,16 @@ return {
                     null_ls.builtins.formatting.prettier,    -- angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
                     null_ls.builtins.formatting.shellharden, -- bash
                     null_ls.builtins.formatting.shfmt,       -- bash
+
                     -- diagnostics
-                    -- null_ls.builtins.diagnostics.npm_groovy_lint, -- groovy
+                    null_ls.builtins.diagnostics.npm_groovy_lint, -- groovy
+                    -- null_ls.builtins.diagnostics.shellcheck,      -- deprecated,  bash
+
+                    --code_actions
+                    null_ls.builtins.code_actions.gitsigns, -- gitsisgns
+
+                    --hover
+                    null_ls.builtins.hover.printenv, -- sh, dosbatch, ps1
                 },
             })
 

@@ -14,8 +14,8 @@ return {
             -- typescriptreact = { "eslint_d" },
             -- svelte = { "eslint_d" },
             -- python = { "ruff" }, -- ruff is also lsp so config is under lsp
-            groovy = { "npm-groovy-lint" },
-            bash = { "shellharden" },
+            -- groovy = { "npm-groovy-lint" }, --not working, has be run under none-ls
+            bash = { "shellcheck" },
         }
 
         local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
