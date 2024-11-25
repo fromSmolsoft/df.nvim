@@ -65,13 +65,12 @@ return {
 
             lspconfig.ruff.setup({
                 -- python
-                -- FIX: buff received invalid settings, falling back to default settings
                 capabilities = capabilities,
 
                 -- init_options = {
                 --     settings = {
                 --         -- Ruff language server settings go here
-                --         -- Shows warning about invalid config. if empty
+                --         -- Shows warning if empty: "Ruff received invalid settings, falling back to default settings"
                 --     }
                 -- },
             })
@@ -191,7 +190,8 @@ return {
                     null_ls.builtins.formatting.shfmt,       -- bash
 
                     -- diagnostics
-                    null_ls.builtins.diagnostics.npm_groovy_lint.with({ filetypes = { "groovy", "Jenkinsfile" } }), -- groovy, FIX: stop suggestion to remove semicolons from all java lines
+                    null_ls.builtins.diagnostics.npm_groovy_lint.with({ filetypes = { "groovy", "Jenkinsfile" } }), -- groovy, filetypes has to specifically not include java or it lints Java in weird way
+
                     -- null_ls.builtins.diagnostics.shellcheck,      -- deprecated,  bash
 
                     --code_actions
