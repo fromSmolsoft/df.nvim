@@ -19,6 +19,7 @@ return {
                 "jdtls",
                 "marksman",
                 "ruff",
+                "pyright"
             },
             auto_install = true,
         },
@@ -110,6 +111,8 @@ return {
                 -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#gradle_ls
                 capabilities = capabilities,
             })
+            
+
 
             vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
             vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
