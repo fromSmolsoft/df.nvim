@@ -1,5 +1,20 @@
 return
 {
+    {
+        "jay-babu/mason-nvim-dap.nvim",
+        -- mason-nvim-dap bridges mason.nvim with the nvim-dap plugin - making it easier to use both plugins together.
+        -- https://github.com/jay-babu/mason-nvim-dap.nvim
+        enabled = false,
+        dependencies = {
+            "williamboman/mason.nvim",
+            "mfussenegger/nvim-dap",
+        },
+        config = function()
+            require("mason-nvim-dap").setup({
+                automatic_installation = true,
+            })
+        end
+    },
     { -- debugger adapter
 
         "mfussenegger/nvim-dap",
