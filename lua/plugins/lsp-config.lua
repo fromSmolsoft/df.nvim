@@ -32,32 +32,76 @@ return {
         lazy = false,
         config = function()
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
             local lspconfig = require("lspconfig")
+
+            vim.api.nvim_create_autocmd("LspAttach", {
+                desc = "Lsp Actions",
+                callback = function(event)
+                    local opts = { buffer = event.buf }
+                    print("Lsp Attached")
+                    vim.keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
+
+                    vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
+                    vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
+                    vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
+                    vim.keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
+                    vim.keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
+                    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+
+                    -- configure lsp line diagnostics
+                    vim.diagnostic.config({
+                        severity_sort = true,
+                        virtual_text = false,
+                        signs = true,
+                        underline = true,
+                        float = {
+                            source = "if_many"
+                        }
+                    })
+
+                    vim.o.updatetime = 250
+                    vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
+                    -- toggle diagnostics
+                    local function togle_diagnostics()
+                        if vim.diagnostic.is_enabled() then
+                            vim.diagnostic.enable(false)
+                            vim.diagnostic.reset()
+                            vim.notify("diagnostics disabled") --print to status bar
+                        else
+                            vim.diagnostic.enable(true)
+                            vim.notify("diagnostics enabled")
+                            -- Show line diagnostics automatically in hover window
+                        end
+                    end
+
+                    vim.keymap.set('n', '<leader>td', togle_diagnostics, { desc = "disgnostic toogle" })
+
+                    -- TODO: reference highlighting
+                    -- vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.lsp.buf.document_highlight(nil, {focus=false, scope="cursor"})]]
+                end
+            })
 
             lspconfig.lua_ls.setup({
                 capabilities = capabilities,
+                settings = {
+                    Lua = {
+                        diagnostics = {
+                            globals = { "vim", "describe", "it", "before_each", "after_each" },
+                        },
+                    },
+                },
             })
 
             lspconfig.marksman.setup({
                 capabilities = capabilities,
             })
 
-            -- lspconfig.java.setup({
-            --     capabilities = capabilities })
 
             lspconfig.jdtls.setup({
                 jdtls = function()
                     return true
                 end,
             })
-
-            -- lspconfig.ast_grep.setup({
-            -- Very complex setup.
-            --  - Every individual project has to include extensive file structure for every single rule for every library that is given by other tool by default. There doesn't seem to be any defaul rule setting available ATM.
-            --     -- "c", "cpp", "rust", "go", "java", "python", "javascript", "typescript", "html", "css", "kotlin", "dart", "lua"
-            --     capabilities = capabilities,
-            -- })
 
             lspconfig.pyright.setup({
                 -- python
@@ -102,54 +146,11 @@ return {
                 capabilities = capabilities,
             })
 
-            -- lspconfig.groovyls.setup({
-            --     capabilities = capabilities,
-            -- })
-
             lspconfig.gradle_ls.setup({
                 -- Gradle ls https://github.com/microsoft/vscode-gradle
                 -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#gradle_ls
                 capabilities = capabilities,
             })
-            
-
-
-            vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
-            vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
-            vim.keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
-            vim.keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
-            vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
-
-            -- configure lsp line diagnostics
-            vim.diagnostic.config({
-                severity_sort = true,
-                virtual_text = false,
-                signs = true,
-                underline = true,
-                float = {
-                    source = "if_many"
-                }
-            })
-
-            -- toggle diagnostics
-            local function togle_diagnostics()
-                if vim.diagnostic.is_enabled() then
-                    vim.diagnostic.enable(false)
-                    vim.diagnostic.reset()
-
-                    -- Show line diagnostics automatically in hover window
-                    vim.o.updatetime = 250
-                    vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
-
-                    vim.notify("diagnostics disabled") --print to status bar
-                else
-                    vim.diagnostic.enable(true)
-                    vim.notify("diagnostics enabled")
-                end
-            end
-
-            vim.keymap.set('n', '<leader>td', togle_diagnostics, { desc = "disgnostic toogle" })
         end,
     },
     {
@@ -164,6 +165,7 @@ return {
 
         -- load on lsp buffer attaching
         -- FIX: trows error Attempt to get length of local 'spec'
+        -- TODO: merge with already existing autocom "LspAttach"
         -- vim.api.nvim_create_autocmd("LspAttach", {
         --     callback = function(args)
         --         local bufnr = args.buf
@@ -179,6 +181,7 @@ return {
     },
     {
         "nvimtools/none-ls.nvim", -- provides hook for non-lsp tools to hook into its lsp client (linters,formatters,..)
+        enabled = true,
         dependencies = {
             "nvim-lua/plenary.nvim",
         },
