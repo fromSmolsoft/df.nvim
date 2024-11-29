@@ -79,7 +79,9 @@ return
 
             -- setup servers that share same configuration in loop
             local servers = {
-                "marksman", "jdtls", "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es",
+                "marksman", 
+                    --"jdtls", -- jdtls has it's own plugin 
+                    "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es",
                 "gradle_ls" }
             for _, lsp in pairs(servers) do
                 lspconfig[lsp].setup {
