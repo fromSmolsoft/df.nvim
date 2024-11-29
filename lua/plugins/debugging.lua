@@ -17,7 +17,7 @@ return
 
             vTxt.setup()
 
-            --bash debud    
+            --bash debug
             dap.adapters.bashdb = {
                 type = 'executable',
                 command = vim.fn.stdpath("data") .. '/mason/packages/bash-debug-adapter/bash-debug-adapter',
@@ -32,7 +32,7 @@ return
                     name = "Launch file",
                     showDebugOutput = true,
                     pathBashdb = vim.fn.stdpath("data") ..
-                    '/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
+                        '/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
                     pathBashdbLib = vim.fn.stdpath("data") .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir',
                     trace = true,
                     file = "${file}",
@@ -92,8 +92,8 @@ return
         ft = "python",
         dependencies = { "mfussenegger/nvim-dap", "rcarriga/nvim-dap-ui", },
         config = function()
-            -- FIX: permission denied when accessing debugpy path
-            local path = "~/.local/share/nvim/mason/packages/debugpy/venv/bin/"
+            -- path to .venv in root folder and debugpy must be installed there by pip install debugpy
+            local path = ".venv/bin/python"
             require('dap-python').setup(path)
         end
     },
