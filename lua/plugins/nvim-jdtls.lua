@@ -4,17 +4,29 @@ return {
     -- https://github.com/mfussenegger/nvim-jdtls
     -- doesn't seem to do more than Mason jdtls
     enabled = true,
+    --  FIX: It loads jdtls upon opening first java file (buffer) but when opening next file in same session, jdtls is not longer attached for a next file
     ft = "java",
+
+    -- setup options
     opts = {
+
         cmd = {
-            -- TODO: failed to verify java version
             vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
             ('--jvm-arg=-javaagent:%s'):format(vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar')
         },
+
         capabilities = require 'cmp_nvim_lsp'.default_capabilities(),
+
         bundles = { vim.fn.expand '$HOME/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar' },
-        root_dir = vim.fs.dirname(vim.fs.find({ 'gradlew', '.git', 'mvnw' }, { upward = true })[1] or vim.fn.getcwd()),
+
+        root_dir = vim.fs.dirname(
+            vim.fs.find(
+                { 'gradlew', '.git', 'mvnw' },
+                { upward = true })[1] or vim.fn.getcwd()
+        ),
     },
+
+    -- setup nvim-jdtls
     config = function(_, opts)
         print("Starting JDTLS...")
         local success, result = pcall(require('jdtls').start_or_attach, opts)
@@ -84,7 +96,7 @@ return {
 --
 --                             local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
 --                             -- vim.lsp.set_log_level('DEBUG')
---                             local workspace_dir = "/home/jake/.workspace/" ..
+--                             local workspace_dir = "$HOME/.workspace/" ..
 --                             project_name                                 -- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
 --                             local config = {
 --                                 -- The command that starts the language server
@@ -94,8 +106,8 @@ return {
 --                                     "java", -- or '/path/to/java17_or_newer/bin/java'
 --                                     -- depends on if `java` is in your $PATH env variable and if it points to the right version.
 --
---                                     "-javaagent:/home/jake/.local/share/java/lombok.jar",
---                                     -- '-Xbootclasspath/a:/home/jake/.local/share/java/lombok.jar',
+--                                     "-javaagent:$HOME/.local/share/java/lombok.jar",
+--                                     -- '-Xbootclasspath/a:$HOME/.local/share/java/lombok.jar',
 --                                     "-Declipse.application=org.eclipse.jdt.ls.core.id1",
 --                                     "-Dosgi.bundles.defaultStartLevel=4",
 --                                     "-Declipse.product=org.eclipse.jdt.ls.core.product",
