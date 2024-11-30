@@ -23,7 +23,14 @@ return
         "neovim/nvim-lspconfig",
         lazy = false,
         config = function()
+            -- capabilities: deprecated but `usePlaceholders` work eg. `prin` auto-completes to  `print()`
+            -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+            -- capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+
+            -- capabilities: new way, no need for `make_client_capabilities()`
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
+            capabilities.textDocument.completion.completionItem.snippetSupport = true
+
             local lspconfig = require("lspconfig")
 
             vim.api.nvim_create_autocmd("LspAttach", {
@@ -79,13 +86,17 @@ return
 
             -- setup servers that share same configuration in loop
             local servers = {
-                "marksman", 
-                    --"jdtls", -- jdtls has it's own plugin 
-                    "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es",
+                "marksman",
+                --"jdtls", -- jdtls has it's own plugin
+                "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es",
                 "gradle_ls" }
             for _, lsp in pairs(servers) do
                 lspconfig[lsp].setup {
-                    capabilities = capabilities
+                    capabilities = capabilities,
+                    init_options = {
+                        -- Most likely not needed anymore due to capabilities' config
+                        usePlaceholders = true,
+                    },
                 }
             end
 
@@ -94,6 +105,10 @@ return
                 capabilities = capabilities,
                 settings = {
                     Lua = {
+                        init_options = {
+                            -- Most likely not needed anymore due to capabilities' config
+                            usePlaceholders = true,
+                        },
                         diagnostics = {
                             globals = { "vim", "describe", "it", "before_each", "after_each" },
                         },
@@ -101,6 +116,7 @@ return
                             -- Make the server aware of Neovim runtime files
                             library = vim.api.nvim_get_runtime_file("", true),
                         },
+
                         -- By default, lua-language-server sends anonymized data to its developers. Stop it using the following.
                         telemetry = {
                             enable = false,
