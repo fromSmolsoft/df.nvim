@@ -4,7 +4,7 @@ return {
     -- https://github.com/mfussenegger/nvim-jdtls
     -- doesn't seem to do more than Mason jdtls
     enabled = true,
-    --  FIX: It loads jdtls upon opening first java file (buffer) but when opening next file in same session, jdtls is not longer attached for a next file
+    --  It loads jdtls upon opening first java file (buffer)  FIX: when opening another file in same session, jdtls doesn't attach to newly opened buffer
     ft = "java",
 
     -- setup options
