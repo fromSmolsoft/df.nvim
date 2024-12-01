@@ -1,10 +1,11 @@
 return {
+    -- java
     'mfussenegger/nvim-jdtls',
     dependencies = 'hrsh7th/cmp-nvim-lsp',
     -- https://github.com/mfussenegger/nvim-jdtls
     -- doesn't seem to do more than Mason jdtls
     enabled = true,
-    --  It loads jdtls upon opening first java file (buffer)  FIX: when opening another file in same session, jdtls doesn't attach to newly opened buffer
+    --  It loads jdtls upon opening first java file (buffer)  FIX: when opening another file in same session, jdtls doesn't attach to newly opened buffer, possible solution => create autocomand based on filetype java
     ft = "java",
 
     -- setup options
