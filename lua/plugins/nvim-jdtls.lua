@@ -6,36 +6,43 @@ return {
     -- doesn't seem to do more than Mason jdtls
     enabled = true,
     --  It loads jdtls upon opening first java file (buffer)  FIX: when opening another file in same session, jdtls doesn't attach to newly opened buffer, possible solution => create autocomand based on filetype java
-    ft = "java",
+    -- ft = "java",
 
     -- setup options
-    opts = {
+    opts = function()
+        local mason_registry = require("mason-registry")
+        local lombok_jar = mason_registry.get_package("jdtls"):get_install_path() .. "/lombok.jar"
+        print(lombok_jar)
 
-        cmd = {
-            vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
-            ('--jvm-arg=-javaagent:%s'):format(vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar')
-        },
+        return {
+            cmd = {
+                vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
+                ('--jvm-arg=-javaagent:%s'):format(vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar')
+            },
+            capabilities = require 'cmp_nvim_lsp'.default_capabilities(),
+            bundles = { vim.fn.expand '$HOME/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar' },
 
-        capabilities = require 'cmp_nvim_lsp'.default_capabilities(),
-
-        bundles = { vim.fn.expand '$HOME/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar' },
-
-        root_dir = vim.fs.dirname(
-            vim.fs.find(
-                { 'gradlew', '.git', 'mvnw' },
-                { upward = true })[1] or vim.fn.getcwd()
-        ),
-    },
+            root_dir = vim.fs.dirname(vim.fs.find({ 'gradlew', '.git', 'mvnw' }, { upward = true })[1] or vim.fn.getcwd()),
+        }
+    end,
 
     -- setup nvim-jdtls
     config = function(_, opts)
-        print("Starting JDTLS...")
-        local success, result = pcall(require('jdtls').start_or_attach, opts)
-        if success then
-            print("JDTLS started successfully")
-        else
-            print("Error starting JDTLS: " .. tostring(result))
-        end
+        -- autocomand to start_or_attach this only for java 
+        vim.api.nvim_create_autocmd("FileType", {
+            pattern = "java",
+            callback = function()
+
+                print("Starting JDTLS...")
+                local success, result = pcall(require('jdtls').start_or_attach, opts)
+                if success then
+                    print("JDTLS started successfully")
+                else
+                    print("Error starting JDTLS: " .. tostring(result))
+                end
+            end
+        }
+        )
     end
 }
 -- alternative config source: https://www.reddit.com/r/neovim/comments/11k3zuv/comment/jb5q1bm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
