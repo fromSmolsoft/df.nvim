@@ -14,6 +14,13 @@ return
         opts = {
             ensure_installed = { "taplo", "lua_ls", "jdtls", "marksman", "ruff", "pyright" },
             auto_install = true,
+
+            -- Prevents attaching jdtls server by lazy.  jdtls has its own plugin.
+            function(server_name)
+                if server_name == "jdtls" then
+                    return true
+                end
+            end
         },
         config = function(_, opts)
             require("mason-lspconfig").setup(opts)
@@ -101,6 +108,16 @@ return
             end
 
             -- individual server configuration
+            -- lspconfig.jdtls.setup({
+            --     setup = {
+            --         jdtls = function()
+            --             -- FIX: doesn't stop second jdtls from attaching
+            --             -- disable LazyVim from setting up jdtls automatically
+            --             return true
+            --         end,
+            --     },
+            -- })
+
             lspconfig.lua_ls.setup({
                 capabilities = capabilities,
                 settings = {
