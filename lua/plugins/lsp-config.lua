@@ -30,11 +30,6 @@ return
         "neovim/nvim-lspconfig",
         lazy = false,
         config = function()
-            -- capabilities: deprecated but `usePlaceholders` work eg. `prin` auto-completes to  `print()`
-            -- local capabilities = vim.lsp.protocol.make_client_capabilities()
-            -- capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
-
-            -- capabilities: new way, no need for `make_client_capabilities()`
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             capabilities.textDocument.completion.completionItem.snippetSupport = true
 
@@ -107,17 +102,6 @@ return
                 }
             end
 
-            -- individual server configuration
-            -- lspconfig.jdtls.setup({
-            --     setup = {
-            --         jdtls = function()
-            --             -- FIX: doesn't stop second jdtls from attaching
-            --             -- disable LazyVim from setting up jdtls automatically
-            --             return true
-            --         end,
-            --     },
-            -- })
-
             lspconfig.lua_ls.setup({
                 capabilities = capabilities,
                 settings = {
@@ -146,7 +130,6 @@ return
 
     {
         "ray-x/lsp_signature.nvim", -- Show doc strings upon hover
-        -- FIX: Hover doesn't show doc-string, status bar writes "No information available"
         enabled = true,
         event = "VeryLazy",
         opts = {},
