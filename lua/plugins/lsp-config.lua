@@ -15,15 +15,21 @@ return
             ensure_installed = { "taplo", "lua_ls", "jdtls", "marksman", "ruff", "pyright" },
             auto_install = true,
 
-            -- Prevents attaching jdtls server by lazy.  jdtls has its own plugin.
-            function(server_name)
-                if server_name == "jdtls" then
-                    return true
-                end
-            end
+            -- use only alongside `nvim-jdtls` Prevents attaching jdtls server by lazy.  jdtls has its own plugin.
+            -- function(server_name)
+            --     if server_name == "jdtls" then
+            --         return true
+            --     end
+            -- end
         },
         config = function(_, opts)
             require("mason-lspconfig").setup(opts)
+        end
+    },
+    {
+        "nvim-java/nvim-java",
+        config = function()
+            require('java').setup({})
         end
     },
     {
@@ -89,7 +95,7 @@ return
             -- setup servers that share same configuration in loop
             local servers = {
                 "marksman",
-                --"jdtls", -- jdtls has it's own plugin
+                "jdtls", -- don't setup jdtls if nvim-jdtls is used
                 "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es",
                 "gradle_ls" }
             for _, lsp in pairs(servers) do

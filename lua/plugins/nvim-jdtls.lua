@@ -1,16 +1,13 @@
-return {
+return
+{
     -- java
     'mfussenegger/nvim-jdtls',
     dependencies = 'hrsh7th/cmp-nvim-lsp',
     -- https://github.com/mfussenegger/nvim-jdtls
-    enabled = true,
+    enabled = false, -- trying out https://github.com/nvim-java/nvim-java instead and can't be used together
 
     -- setup options
     opts = function()
-        local mason_registry = require("mason-registry")
-        local lombok_jar = mason_registry.get_package("jdtls"):get_install_path() .. "/lombok.jar"
-        print(lombok_jar)
-
         return {
             cmd = {
                 vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
@@ -21,6 +18,7 @@ return {
 
             root_dir = vim.fs.dirname(vim.fs.find({ 'gradlew', '.git', 'mvnw' }, { upward = true })[1] or vim.fn.getcwd()),
         }
+        -- TODO: configure dab (debugging)
     end,
 
     -- setup nvim-jdtls
