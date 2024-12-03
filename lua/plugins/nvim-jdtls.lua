@@ -27,12 +27,12 @@ return
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "java",
             callback = function()
-                print("Starting JDTLS...")
+                vim.notify("Starting JDTLS...")
                 local success, result = pcall(require('jdtls').start_or_attach, opts)
                 if success then
-                    print("JDTLS started successfully")
+                    vim.notify("JDTLS started successfully")
                 else
-                    print("Error starting JDTLS: " .. tostring(result))
+                    vim.notify("Error starting JDTLS: " .. tostring(result))
                 end
             end
         })

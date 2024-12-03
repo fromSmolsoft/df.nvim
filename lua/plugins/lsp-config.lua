@@ -44,7 +44,7 @@ return
             vim.api.nvim_create_autocmd("LspAttach", {
                 desc = "Lsp Actions",
                 callback = function(event)
-                    vim.notify("Lsp attached")
+                    -- vim.notify("Lsp attached")
                     -- keymaps
                     local opts = { buffer = event.buf }
                     vim.keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
