@@ -44,8 +44,7 @@ return
             vim.api.nvim_create_autocmd("LspAttach", {
                 desc = "Lsp Actions",
                 callback = function(event)
-                    print("Lsp Attached")
-
+                    vim.notify("Lsp attached")
                     -- keymaps
                     local opts = { buffer = event.buf }
                     vim.keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
@@ -77,11 +76,10 @@ return
                         if vim.diagnostic.is_enabled() then
                             vim.diagnostic.enable(false)
                             vim.diagnostic.reset()
-                            vim.notify("diagnostics disabled") --print to status bar
+                            vim.notify("𐄂 Diagnostics disabled") --print to status bar
                         else
                             vim.diagnostic.enable(true)
-                            vim.notify("diagnostics enabled")
-                            -- Show line diagnostics automatically in hover window
+                            vim.notify("✅ Diagnostics enabled")
                         end
                     end
 
