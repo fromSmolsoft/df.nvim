@@ -28,13 +28,34 @@ return
     },
     {
         "nvim-java/nvim-java",
+        -- FIX: trows error when configuring dap despite dap being diabled
+        -- FIX: Gradle project resolve imports can't be resolved etc.
+
         config = function()
-            require('java').setup({})
+            require('java').setup({
+                java_debug_adapter = {
+                    enable = false,
+                },
+            })
+        end
+    },
+    {
+        -- Allows switching between custom lsp configurations per project or globally
+        "folke/neoconf.nvim",
+        -- - configure Neovim using JSON files (can have comments)
+        --   - global settings: ~/.config/nvim/neoconf.json
+        --   - local settings: ~/projects/foobar/.neoconf.json
+        -- enabled = false,
+        config = function()
+            require("neoconf").setup({
+                -- override any of the default settings here
+            })
         end
     },
     {
         "neovim/nvim-lspconfig",
-        lazy = false,
+        -- lazy = false,
+        dependencies = { "folke/neoconf.nvim", "nvim-java/nvim-java", },
         config = function()
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             capabilities.textDocument.completion.completionItem.snippetSupport = true
@@ -93,7 +114,7 @@ return
             -- setup servers that share same configuration in loop
             local servers = {
                 "marksman",
-                "jdtls", -- don't setup jdtls if nvim-jdtls is used
+                --"jdtls", -- don't setup jdtls if nvim-jdtls is used
                 "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es",
                 "gradle_ls" }
             for _, lsp in pairs(servers) do
@@ -105,6 +126,7 @@ return
                     },
                 }
             end
+            lspconfig.jdtls.setup({})
 
             lspconfig.lua_ls.setup({
                 capabilities = capabilities,
@@ -146,7 +168,7 @@ return
         "nvimtools/none-ls.nvim", -- provides hook for non-lsp tools to hook into its lsp client (linters,formatters,..)
         enabled = true,
         dependencies = {
-            "nvim-lua/plenary.nvim",
+            "nvim-lua/plenary.nvim", lazy = true
         },
         config = function()
             local null_ls = require("null-ls")

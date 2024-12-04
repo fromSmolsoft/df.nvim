@@ -13,7 +13,7 @@ return
                     'github:nvim-java/mason-registry',
                     'github:mason-org/mason-registry',
                 },
-                ensure_installed = { "java-debug-adapter", "java-test" }
+                -- ensure_installed = { "java-debug-adapter", "java-test" }
             },
 
         },
@@ -26,21 +26,21 @@ return
             vTxt.setup()
 
             -- java debug FIX: missing dab.adapter.java
-            dap.adapters.java = {
-                type = 'server',
-                host = '127.0.0.1',
-                port = 5005,
-            }
-
-            dap.configurations.java = {
-                {
-                    type = 'java',
-                    name = 'Debug (Attach)',
-                    request = 'attach',
-                    hostName = '127.0.0.1',
-                    port = 5005,
-                },
-            }
+            -- dap.adapters.java = {
+            --     type = 'server',
+            --     host = '127.0.0.1',
+            --     port = 5005,
+            -- }
+            --
+            -- dap.configurations.java = {
+            --     {
+            --         type = 'java',
+            --         name = 'Debug (Attach)',
+            --         request = 'attach',
+            --         hostName = '127.0.0.1',
+            --         port = 5005,
+            --     },
+            -- }
 
             --bash debug
             dap.adapters.bashdb = {
