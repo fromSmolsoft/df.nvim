@@ -10,7 +10,9 @@ local clients_lsp = function()
 
     local c = {}
     for _, client in pairs(clients) do
-        table.insert(c, client.name:match '^()%s*$' and '' or client.name:match '^%s*(.*%S)')
+        -- table.insert(c, client.name:match '^()%s*$' and '' or client.name:match '^%s*(.*%S)')
+        local lspName = string.gsub(client.name, "%s+", "")
+        table.insert(c, lspName)
     end
     return '\u{f085} ' .. table.concat(c, '|')
 end
