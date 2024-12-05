@@ -9,11 +9,12 @@ return
             "nvim-neotest/nvim-nio",
             "williamboman/mason.nvim",
             opts = {
-                registries = {
-                    'github:nvim-java/mason-registry',
-                    'github:mason-org/mason-registry',
-                },
-                -- ensure_installed = { "java-debug-adapter", "java-test" }
+                -- -- attempt at fixing java-nvim dap 
+                -- registries = {
+                --     'github:nvim-java/mason-registry',
+                --     'github:mason-org/mason-registry',
+                -- },
+                ensure_installed = { "java-debug-adapter", "java-test" }
             },
 
         },
@@ -23,7 +24,7 @@ return
             local ui = require("dapui")
             local vTxt = require("nvim-dap-virtual-text")
 
-            vTxt.setup()
+            vTxt.setup({})
 
             -- java debug FIX: missing dab.adapter.java
             -- dap.adapters.java = {

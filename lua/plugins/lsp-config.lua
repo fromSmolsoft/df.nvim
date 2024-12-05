@@ -2,7 +2,7 @@ return
 {
     {
         "williamboman/mason.nvim",
-        lazy = false,
+        -- lazy = false,
         opts = {},
         config = function(_, opts)
             require("mason").setup(opts)
@@ -10,17 +10,17 @@ return
     },
     {
         "williamboman/mason-lspconfig.nvim",
-        lazy = false,
+        -- lazy = false,
         opts = {
             ensure_installed = { "taplo", "lua_ls", "jdtls", "marksman", "ruff", "pyright" },
             auto_install = true,
 
             -- use only alongside `nvim-jdtls` Prevents attaching jdtls server by lazy.  jdtls has its own plugin.
-            -- function(server_name)
-            --     if server_name == "jdtls" then
-            --         return true
-            --     end
-            -- end
+            function(server_name)
+                if server_name == "jdtls" then
+                    return true
+                end
+            end
         },
         config = function(_, opts)
             require("mason-lspconfig").setup(opts)
@@ -30,7 +30,7 @@ return
         "nvim-java/nvim-java",
         -- FIX: trows error when configuring dap despite dap being diabled
         -- FIX: Gradle project resolve imports can't be resolved etc.
-
+        enabled = false, -- not to be used alongside nvim-jdtls
         config = function()
             require('java').setup({
                 java_debug_adapter = {
@@ -126,7 +126,6 @@ return
                     },
                 }
             end
-            lspconfig.jdtls.setup({})
 
             lspconfig.lua_ls.setup({
                 capabilities = capabilities,
