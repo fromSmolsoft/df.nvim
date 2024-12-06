@@ -1,20 +1,23 @@
--- LSP clients attached to buffer
+-- return string of LSP clients attached to current buffer
 local clients_lsp = function()
-    -- local bufnr = vim.api.nvim_get_current_buf() -- needed for buf_get_clients(...)
-    -- local clients = vim.lsp.buf_get_clients(bufnr) -- deprecated
-
     local clients = vim.lsp.get_clients()
     if next(clients) == nil then
-        return ''
+        return ' '
     end
 
     local c = {}
     for _, client in pairs(clients) do
-        -- table.insert(c, client.name:match '^()%s*$' and '' or client.name:match '^%s*(.*%S)')
-        local lspName = string.gsub(client.name, "%s+", "")
+        -- FIX: trows error `illegal character < >` at "random", when run together with jdtls-nvim on java project
+
+        -- replace non-alphanumerical characters
+        local lspName = string.gsub(client.name, "%W", "_")
+
+        -- trim whitespaces
+        lspName = lspName:match '^()%s*$' and '' or lspName:match '^%s*(.*%S)'
         table.insert(c, lspName)
     end
-    return '\u{f085} ' .. table.concat(c, '|')
+    -- return '\u{f085} ' .. table.concat(c, ',')
+    return 'lsp:' .. table.concat(c, '|')
 end
 
 return {

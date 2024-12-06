@@ -3,7 +3,7 @@ return {
     "Exafunction/codeium.nvim",
 
     -- enable / disable plugin
-    enabled = false,
+    enabled = true,
 
     dependencies = {
         "nvim-lua/plenary.nvim",
