@@ -8,6 +8,8 @@ api.nvim_create_autocmd("TextYankPost", {
 })
 
 local group = vim.api.nvim_create_augroup("jump_last_position", { clear = true })
+
+-- FIXME:Throws `while processing BufReadCmd Autocommands for "fugitive://*"....Cursor position outside buffer...`
 vim.api.nvim_create_autocmd(
     "BufReadPost",
     {
