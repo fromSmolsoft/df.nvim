@@ -19,23 +19,18 @@ return
         -- my own fork that fixes freezing
         -- 'fromSmolsoft/nvim-soil',
         -- branch = "unfreeze",
-
+        ft = "plantuml",
         -- Optional for puml syntax highlighting:
         dependencies = { 'javiorfo/nvim-nyctophilia' },
-        lazy = true,
-        ft = "plantuml",
+        -- lazy = true,
         opts = {
-            -- If you want to change default configurations
-
             -- If you want to use Plant UML jar version instead of the install version
             -- puml_jar = "/path/to/plantuml.jar",
 
             -- If you want to customize the image showed when running this plugin
             image = {
-                -- darkmode = true, -- Enable or disable darkmode
                 darkmode = false, -- Enable or disable darkmode
-                -- format = "svg",   -- Choose between png or svg
-                format = "png",   -- Choose between png or svg
+                format = "png",   -- Choose between png or svg (svg has white background)
 
                 -- This is a default implementation of using nsxiv to open the resultant image
                 -- Edit the string to use your preferred app to open the image (as if it were a command line)
@@ -44,13 +39,9 @@ return
                 -- return "xdg-open " .. img
                 execute_to_open = function(img)
                     return "nsxiv -b " .. img
-                end
+                end,
+                vim.keymap.set("n", "<leader>ur", ":Soil", { desc = "Puml->img & open" })
             }
         },
-        config = function(_, opts)
-            require("soil").setup(opts)
-        end,
-
-        vim.keymap.set("n", "<leader>ur", ":Soil", { desc = "Puml->img & open" })
     }
 }

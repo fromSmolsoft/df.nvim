@@ -4,7 +4,6 @@ return
     'mfussenegger/nvim-jdtls',
     -- nvim-jdtls:  https://github.com/mfussenegger/nvim-jdtls
     enabled = true, -- trying out https://github.com/nvim-java/nvim-java instead and can't be used together
-
     dependencies = { 'hrsh7th/cmp-nvim-lsp', "mfussenegger/nvim-dap" },
 
     -- setup options
@@ -18,7 +17,6 @@ return
             -- bundles = { vim.fn.expand '$HOME/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar' },
             bundles = vim.split(vim.fn.glob('$HOME/.local/share/nvim/mason/packages/java-*/extension/server/*.jar', 1),
                 '\n'),
-
             root_dir = vim.fs.dirname(vim.fs.find({ 'gradlew', '.git', 'mvnw' }, { upward = true })[1] or vim.fn.getcwd()),
         }
         -- TODO: configure dab (debugging)
@@ -33,9 +31,9 @@ return
                 vim.notify("Starting JDTLS...")
                 local success, result = pcall(require('jdtls').start_or_attach, opts)
                 if success then
-                    vim.notify("JDTLS started successfully")
+                    vim.notify("JDTLS started")
                 else
-                    vim.notify("Error starting JDTLS: " .. tostring(result))
+                    vim.notify("Error JDTLS: " .. tostring(result))
                 end
             end
         })

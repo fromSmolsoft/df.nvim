@@ -26,10 +26,10 @@ return {
             -- pattern = [[\b(KEYWORDS):]],
             pattern = [[\b(KEYWORDS)\b]], -- match without the extra colon. You'll likely get false positives
 
-        }
+        },
+        vim.keymap.set("n", "<leader>tt", ":TodoTelescope<CR>", { desc = "TODO Telescope" }),
+        vim.keymap.set("n", "<leader>tl", ":TodoLocList<CR>", { desc = "TODO List" }),
+        -- vim.keymap.set("n", "<leader>tf", ":TodoQuickFix<CR>", { desc = "TODO QuickFix" }),
     },
-    vim.keymap.set("n", "<leader>tt", ":TodoTelescope<CR>", { desc = "TODO Telescope" }),
-    vim.keymap.set("n", "<leader>tl", ":TodoLocList<CR>", { desc = "TODO List" }),
-    -- vim.keymap.set("n", "<leader>tf", ":TodoQuickFix<CR>", { desc = "TODO QuickFix" }),
 
 }
