@@ -11,7 +11,7 @@ return
                 -- Whether to enable showing
                 enable = true,
                 -- Duration (in ms) of how long last message should be shown
-                duration_last = 1000,
+                duration_last = 1500,
             },
         },
     },
