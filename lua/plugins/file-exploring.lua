@@ -2,6 +2,7 @@ return
 {
     {
         "nvim-neo-tree/neo-tree.nvim",
+        event = "VeryLazy",
         branch = "v3.x",
         dependencies = {
             "nvim-lua/plenary.nvim",
@@ -9,13 +10,13 @@ return
             "MunifTanjim/nui.nvim",
         },
         config = function()
-            vim.keymap.set("n", "<C-n>", ":Neotree filesystem reveal left<CR>", {})
+            vim.keymap.set("n", "<C-n>", ":Neotree filesystem toggle reveal left<CR>", {})
             vim.keymap.set("n", "<leader>bf", ":Neotree buffers reveal float<CR>", {})
             require("neo-tree").setup {
                 auto_clean_after_session_restore = true, -- Automatically clean up broken neo-tree buffers saved in sessions
                 filesystem = {
-                    group_empty_dirs = true,
-                    scan_mode = "deep",
+                    group_empty_dirs = true,             -- Concatenate parent directories on path that have no files
+                    scan_mode = "deep",                  -- Needed for group_empty_dirs
                 },
             }
         end,
@@ -46,10 +47,6 @@ return
             vim.keymap.set("n", "<leader>o", ":Oil<CR>", { desc = "Oil" })
         },
 
-        -- load custom settings
-        config = function(_, opts)
-            require("oil").setup(opts)
-        end,
         -- Optional dependencies
         dependencies = { { "echasnovski/mini.icons", opts = {} } },
         -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
@@ -63,8 +60,5 @@ return
         "FerretDetective/oil-git-signs.nvim",
         ft = "oil",
         opts = {},
-        config = function(_, opts)
-            require("oil-git-signs").setup(opts)
-        end
     },
 }

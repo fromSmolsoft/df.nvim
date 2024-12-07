@@ -2,6 +2,7 @@ return
 {
     {
         "echasnovski/mini.notify",
+        enabled = false,
         version = "*", -- stable  '*'
         event = "VeryLazy",
         opts = {
@@ -13,16 +14,17 @@ return
                 duration_last = 1000,
             },
         },
-        config = function(_, opts)
-            require("mini.notify").setup(opts)
-        end
+    },
+    {
+        "rcarriga/nvim-notify",
+        enabled = false, -- optional dependency of "noice.nvim"
+        event = "VeryLazy",
+        opts = { top_down = false }
     },
     {
         "folke/noice.nvim",
-        enabled = false,
+        enabled = true,
         event = "VeryLazy",
-
-
         opts = {
             -- add any options here
             lsp = {
@@ -53,12 +55,7 @@ return
             -- OPTIONAL:
             --   `nvim-notify` is only needed, if you want to use the notification view.
             --   If not available, we use `mini` as the fallback
-            "rcarriga/nvim-notify",
+            -- "rcarriga/nvim-notify",
         },
-
-        config = function(_, opts)
-            require("noice").setup(opts)
-            require("notify").setup({ top_down = false })
-        end
     }
 }

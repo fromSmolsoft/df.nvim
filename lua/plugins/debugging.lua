@@ -9,7 +9,7 @@ return
             "nvim-neotest/nvim-nio",
             "williamboman/mason.nvim",
             opts = {
-                -- -- attempt at fixing java-nvim dap 
+                -- attempt at fixing java-nvim dap
                 -- registries = {
                 --     'github:nvim-java/mason-registry',
                 --     'github:mason-org/mason-registry',
@@ -24,7 +24,7 @@ return
             local ui = require("dapui")
             local vTxt = require("nvim-dap-virtual-text")
 
-            vTxt.setup({})
+            vTxt.setup({ enabled = true, })
 
             -- java debug FIX: missing dab.adapter.java
             -- dap.adapters.java = {
@@ -49,7 +49,6 @@ return
                 command = vim.fn.stdpath("data") .. '/mason/packages/bash-debug-adapter/bash-debug-adapter',
                 name = 'bashdb',
             }
-
 
             dap.configurations.sh = {
                 {

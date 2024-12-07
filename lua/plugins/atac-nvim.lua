@@ -4,11 +4,8 @@ return
     "NachoNievaG/atac.nvim",
     enabled = false,
     dependencies = { "akinsho/toggleterm.nvim" },
-    config = function()
-        require("atac").setup({
-            -- TODO: store project specific files in `project_root/.tmp/atac/`
-            -- dir = vim.fn.resolve(cwd .. "/.atac"), -- By default, the dir will be set as /tmp/atac
-
-        })
-    end,
+    opts = {
+        -- TODO: store project specific files in `project_root/.tmp/atac/`
+        -- dir = vim.fn.resolve(cwd .. "/.atac"), -- By default, the dir will be set as /tmp/atac
+    },
 }

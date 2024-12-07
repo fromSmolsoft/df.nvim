@@ -1,6 +1,7 @@
 return
 {
     "oclay1st/gradle.nvim",
+    event = "VeryLazy",
     cmd = { "Gradle", "GradleExec", "GradleInit" },
     dependencies = {
         "nvim-lua/plenary.nvim",

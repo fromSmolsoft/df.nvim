@@ -7,7 +7,6 @@ return
         'antoinemadec/FixCursorHold.nvim',
         'rcasia/neotest-java',
     },
-
     config = function()
         require 'neotest'.setup({
             adapters = {
