@@ -3,9 +3,9 @@ return
     -- Java (jdtls) custom configuration
     'mfussenegger/nvim-jdtls',
     -- nvim-jdtls:  https://github.com/mfussenegger/nvim-jdtls
-
-    dependencies = 'hrsh7th/cmp-nvim-lsp',
     enabled = true, -- trying out https://github.com/nvim-java/nvim-java instead and can't be used together
+
+    dependencies = { 'hrsh7th/cmp-nvim-lsp', "mfussenegger/nvim-dap" },
 
     -- setup options
     opts = function()
