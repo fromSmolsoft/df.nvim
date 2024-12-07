@@ -24,7 +24,7 @@ return
                 end
             end
         },
-        -- config = function(_, opts) require("mason-lspconfig").setup(opts) end 
+        -- config = function(_, opts) require("mason-lspconfig").setup(opts) end
     },
     {
         "nvim-java/nvim-java", -- https://github.com/nvim-java/nvim-java
@@ -138,7 +138,6 @@ return
             })
         end,
     },
-
     {
         "ray-x/lsp_signature.nvim", -- Show doc strings upon hover
         enabled = true,
@@ -146,7 +145,6 @@ return
         opts = {},
         -- config = function(_, opts) require "lsp_signature".setup(opts) end,
     },
-
     {
         "nvimtools/none-ls.nvim", -- provides hook for non-lsp tools to hook into its lsp client (linters,formatters,..)
         enabled = true,
@@ -156,10 +154,10 @@ return
             null_ls.setup({
                 sources = {
                     -- formatting
-                    null_ls.builtins.formatting.prettier,        -- angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
-                    null_ls.builtins.formatting.npm_groovy_lint, -- groovy
-                    null_ls.builtins.formatting.shellharden,     -- bash
-                    null_ls.builtins.formatting.shfmt,           -- bash
+                    null_ls.builtins.formatting.prettier,    -- angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
+                    null_ls.builtins.formatting.npm_groovy_lint.with({ filetypes = { "groovy", "Jenkinsfile" } }),
+                    null_ls.builtins.formatting.shellharden, -- bash
+                    null_ls.builtins.formatting.shfmt,       -- bash
 
                     -- diagnostics
                     null_ls.builtins.diagnostics.npm_groovy_lint.with({ filetypes = { "groovy", "Jenkinsfile" } }), -- groovy, filetypes has to specifically not include java or it lints Java in weird way
