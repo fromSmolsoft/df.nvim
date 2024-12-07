@@ -18,8 +18,16 @@ return
             bundles = vim.split(vim.fn.glob('$HOME/.local/share/nvim/mason/packages/java-*/extension/server/*.jar', 1),
                 '\n'),
             root_dir = vim.fs.dirname(vim.fs.find({ 'gradlew', '.git', 'mvnw' }, { upward = true })[1] or vim.fn.getcwd()),
+
+            -- dab (debugging)
+            init_options = {
+                bundles = {
+                    vim.fn.glob(
+                        "/home/martin/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
+                        1)
+                },
+            },
         }
-        -- TODO: configure dab (debugging)
     end,
 
     -- setup nvim-jdtls
