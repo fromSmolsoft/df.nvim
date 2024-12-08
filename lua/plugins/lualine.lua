@@ -1,27 +1,32 @@
--- return string of LSP clients attached to current buffer
-local clients_lsp = function()
+-- Helper, returns string of LSP clients attached to current buffer
+local function clients_lsp()
+    -- FIX: when jdtls client gets loaded it trows error illegal char < >
     local clients = vim.lsp.get_clients()
     if next(clients) == nil then
-        return ' '
+        return ""
     end
 
     local c = {}
     for _, client in pairs(clients) do
-        -- FIX: trows error `illegal character < >` at "random", when run together with jdtls-nvim on java project
+        local lspName = client.name
 
         -- replace non-alphanumerical characters
-        local lspName = string.gsub(client.name, "%W", "_")
+        -- local lspName = string.gsub(client.name, "%W", "_")
 
         -- trim whitespaces
-        lspName = lspName:match '^()%s*$' and '' or lspName:match '^%s*(.*%S)'
+        -- lspName = lspName:match '^()%s*$' and '' or lspName:match '^%s*(.*%S)'
+
+        -- Attempt at fixing jdtls' client name occasionally including illegal char < >
+        if string.find(lspName, "jdtls") then lspName = "jdtls" end
         table.insert(c, lspName)
     end
-    -- return '\u{f085} ' .. table.concat(c, ',')
-    return 'lsp:' .. table.concat(c, '|')
+    return '\u{f085}_' .. table.concat(c, '|')
 end
 
-return {
+return
+{
     "nvim-lualine/lualine.nvim",
+    enabled = true,
     dependencies = {
         "nvim-tree/nvim-web-devicons",
         "arkav/lualine-lsp-progress",
@@ -51,10 +56,10 @@ return {
             sections = {
                 lualine_a = { "mode" },
                 lualine_b = { "branch", "diff", "diagnostics" },
-                -- lualine_c = { "filename", "lsp_progress"},
-                lualine_c = { "filename", "lsp_progress", clients_lsp },
-                lualine_x = { "encoding", "fileformat", "filetype" },
-                lualine_y = { "progress" },
+                -- lualine_c = { "filename", clients_lsp, "lsp_progress" },
+                lualine_c = { "filename" },
+                lualine_x = {},
+                lualine_y = { "encoding", "fileformat", "filetype" },
                 lualine_z = { "location" },
             },
             inactive_sections = {

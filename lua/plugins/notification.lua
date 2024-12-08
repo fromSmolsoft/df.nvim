@@ -1,19 +1,32 @@
 return
 {
     {
-        "echasnovski/mini.notify",
-        enabled = false,
-        version = "*", -- stable  '*'
+        "echasnovski/mini.notify", -- https://github.com/echasnovski/mini.nvim/blob/main/doc/mini-notify.txt
+        enabled = true,
+        version = "*",             -- stable  '*'
         event = "VeryLazy",
         opts = {
             -- Notifications about LSP progress
             lsp_progress = {
                 -- Whether to enable showing
-                enable = true,
+                enable = false, -- noice.nvim shows that already
                 -- Duration (in ms) of how long last message should be shown
                 duration_last = 1500,
             },
+            window = {
+                config = {
+                    -- notification placement
+                    -- anchor =  ,
+                    -- col = 1,
+                    -- row = 999,
+                },
+                max_width_share = 0.4,
+            },
         },
+        -- config = function()
+        --     vim.notify = require('mini.notify').make_notify()
+        -- end
+
     },
     {
         "rcarriga/nvim-notify",
