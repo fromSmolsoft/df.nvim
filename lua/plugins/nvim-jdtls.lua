@@ -8,10 +8,39 @@ return
 
     -- setup options
     opts = function()
+        local home = os.getenv("HOME")
+        local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }
+        local pwd = vim.fs.dirname(vim.fs.find(root_markers, { upward = true })[1] or vim.fn.getcwd())
+        local project_name = vim.fn.fnamemodify(pwd, ':p:h:t')
+        local workspace_dir = home .. "/.cache/jdtls/workspace/" .. project_name
+
+        local path_to_mason_packages = home .. "/.local/share/nvim/mason/packages"
+
+        local path_to_jdtls = path_to_mason_packages .. "/jdtls"
+        local path_to_jdebug = path_to_mason_packages .. "/java-debug-adapter"
+        local path_to_jtest = path_to_mason_packages .. "/java-test"
+
+        local path_to_config = path_to_jdtls .. "/config_linux"
+        local lombok_path = path_to_jdtls .. "/lombok.jar"
+
+
+
         return {
             cmd = {
                 vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
-                ('--jvm-arg=-javaagent:%s'):format(vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar')
+                '-Declipse.application=org.eclipse.jdt.ls.core.id1',
+                '-Dosgi.bundles.defaultStartLevel=4',
+                '-Declipse.product=org.eclipse.jdt.ls.core.product',
+                '-Dlog.protocol=true',
+                '-Dlog.level=ALL',
+                '-Xmx1g',
+                '--add-modules=ALL-SYSTEM',
+                '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+                '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+                ('--jvm-arg=-javaagent:%s'):format(vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar'),
+                -- TODO: `'-configuration'`
+                '-data', workspace_dir,
+
             },
             capabilities = require 'cmp_nvim_lsp'.default_capabilities(),
             -- bundles = { vim.fn.expand '$HOME/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar' },
