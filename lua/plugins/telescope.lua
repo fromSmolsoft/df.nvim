@@ -14,10 +14,7 @@ return {
                         -- vertical = { width = 0.9, height = 0,95 },
                     }
                 },
-                extensions = {
-                    ["ui-select"] = {
-                        require("telescope.themes").get_dropdown({}),
-                    },
+                extensions = { ["ui-select"] = { require("telescope.themes").get_dropdown({}), },
                 },
             })
 
@@ -31,8 +28,6 @@ return {
             vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "Find cmd" })
             vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffers" })
             vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Find in files" })
-            -- TODO: use builtin.oldfiles with argument cwd_only=true instead of command
-            -- vim.keymap.set("n", "<leader><leader>", builtin.oldfiles, { desc = "Find oldFiles" })
             vim.keymap.set("n", "<leader><leader>", ":Telescope oldfiles cwd_only=true<CR>", { desc = "Find oldFiles" })
 
             -- Git
