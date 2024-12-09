@@ -10,8 +10,8 @@ return
     opts = function()
         local home = os.getenv("HOME")
         local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }
-        local pwd = vim.fs.dirname(vim.fs.find(root_markers, { upward = true })[1] or vim.fn.getcwd())
-        local project_name = vim.fn.fnamemodify(pwd, ':p:h:t')
+        local root_dir = vim.fs.dirname(vim.fs.find(root_markers, { upward = true })[1] or vim.fn.getcwd())
+        local project_name = vim.fn.fnamemodify(root_dir, ':p:h:t')
         local workspace_dir = home .. "/.cache/jdtls/workspace/" .. project_name
 
         local path_to_mason_packages = home .. "/.local/share/nvim/mason/packages"
@@ -20,9 +20,17 @@ return
         local path_to_jdebug = path_to_mason_packages .. "/java-debug-adapter"
         local path_to_jtest = path_to_mason_packages .. "/java-test"
 
-        local path_to_config = path_to_jdtls .. "/config_linux"
+        -- get the current OS
+        local os
+        if vim.fn.has "macunix" then
+            os = "mac"
+        elseif vim.fn.has "win32" then
+            os = "win"
+        else
+            os = "linux"
+        end
+        local path_to_config = path_to_jdtls .. "/config_" .. os
         local lombok_path = path_to_jdtls .. "/lombok.jar"
-
 
 
         return {
@@ -38,15 +46,14 @@ return
                 '--add-opens', 'java.base/java.util=ALL-UNNAMED',
                 '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
                 ('--jvm-arg=-javaagent:%s'):format(vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar'),
-                -- TODO: `'-configuration'`
+                '-configuration', path_to_config,
                 '-data', workspace_dir,
-
             },
             capabilities = require 'cmp_nvim_lsp'.default_capabilities(),
-            -- bundles = { vim.fn.expand '$HOME/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar' },
             bundles = vim.split(vim.fn.glob('$HOME/.local/share/nvim/mason/packages/java-*/extension/server/*.jar', 1),
                 '\n'),
-            root_dir = vim.fs.dirname(vim.fs.find({ 'gradlew', '.git', 'mvnw' }, { upward = true })[1] or vim.fn.getcwd()),
+            -- root_dir = vim.fs.dirname(vim.fs.find({ 'gradlew', '.git', 'mvnw' }, { upward = true })[1] or vim.fn.getcwd()),
+            root_dir = root_dir,
 
             -- dab (debugging)
             init_options = {
