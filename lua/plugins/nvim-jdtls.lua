@@ -64,7 +64,35 @@ return
             bundles = vim.split(vim.fn.glob('$HOME/.local/share/nvim/mason/packages/java-*/extension/server/*.jar', 1),
                 '\n'),
             root_dir = root_dir,
-            -- settings = { },
+            settings = {
+                java = {
+                    sources = {
+                        organizeImports = {
+                            starThreshold = 9999,
+                            staticStarThreshold = 9999,
+                        },
+                    },
+                    configuration = {
+                        runtimes = {
+                            -- Arch Linux official openJDKs paths:
+                            --    Requires: to install JDK manually
+                            --    eg.: `pacman -S extra/jdk17-openjdk extra/jdk21-openjdk extra/jdk23-openjdk`
+                            {
+                                name = "Java21-arch",
+                                path = "/usr/lib/jvm/java-21-openjdk/bin/",
+                            },
+                            {
+                                name = "Java23-arch",
+                                path = "/usr/lib/jvm/java-23-openjdk/bin/",
+                            },
+                            {
+                                name = "Java17-arch",
+                                path = "/usr/lib/jvm/java-17-openjdk/bin/",
+                            },
+                        }
+                    },
+                }
+            },
 
             -- dab (debugging)
             init_options = {
