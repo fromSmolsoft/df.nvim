@@ -9,18 +9,26 @@ return
     -- setup options
     opts = function()
         local home = os.getenv("HOME")
+        -- Project root & name:
         local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }
         local root_dir = vim.fs.dirname(vim.fs.find(root_markers, { upward = true })[1] or vim.fn.getcwd())
         local project_name = vim.fn.fnamemodify(root_dir, ':p:h:t')
+
+        -- Workspace specific cache: Class paths don't work when workspace is inside root_dir!
         local workspace_dir = home .. "/.cache/jdtls/workspace/" .. project_name
 
-        local path_to_mason_packages = home .. "/.local/share/nvim/mason/packages"
+        -- Dynamically get paths to mason's `.../jdtls` and `.../packages` by going to `/jdtls` parent dir `/..`
+        local path_to_jdtls = require("mason-registry").get_package("jdtls"):get_install_path()
+        local path_to_mason_packages = vim.fn.resolve(path_to_jdtls .. "/..")
 
-        local path_to_jdtls = path_to_mason_packages .. "/jdtls"
+        -- Literal mason path definition:
+        -- local path_to_mason_packages = home .. "/.local/share/nvim/mason/packages" -- literal path
+        -- local path_to_jdtls = path_to_mason_packages .. "/jdtls"
+
         local path_to_jdebug = path_to_mason_packages .. "/java-debug-adapter"
         local path_to_jtest = path_to_mason_packages .. "/java-test"
 
-        -- get the current OS
+        -- Current OS:
         local os
         if vim.fn.has "macunix" then
             os = "mac"
@@ -29,9 +37,10 @@ return
         else
             os = "linux"
         end
+
         local path_to_config = path_to_jdtls .. "/config_" .. os
         local lombok_path = path_to_jdtls .. "/lombok.jar"
-
+        local path_to_jar = path_to_jdtls .. "/org.eclipse.equinox.launcher_*.jar"
 
         return {
             cmd = {
@@ -45,15 +54,45 @@ return
                 '--add-modules=ALL-SYSTEM',
                 '--add-opens', 'java.base/java.util=ALL-UNNAMED',
                 '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
-                ('--jvm-arg=-javaagent:%s'):format(vim.fn.expand '$HOME/.local/share/nvim/mason/packages/jdtls/lombok.jar'),
+                "--jvm-arg=-javaagent:" .. lombok_path,
+                "-jar", path_to_jar,
                 '-configuration', path_to_config,
                 '-data', workspace_dir,
             },
+
             capabilities = require 'cmp_nvim_lsp'.default_capabilities(),
             bundles = vim.split(vim.fn.glob('$HOME/.local/share/nvim/mason/packages/java-*/extension/server/*.jar', 1),
                 '\n'),
-            -- root_dir = vim.fs.dirname(vim.fs.find({ 'gradlew', '.git', 'mvnw' }, { upward = true })[1] or vim.fn.getcwd()),
             root_dir = root_dir,
+            settings = {
+                java = {
+                    sources = {
+                        organizeImports = {
+                            starThreshold = 9999,
+                            staticStarThreshold = 9999,
+                        },
+                    },
+                    configuration = {
+                        runtimes = {
+                            -- Arch Linux official openJDKs paths:
+                            --    Requires: to install JDK manually
+                            --    eg.: `pacman -S extra/jdk17-openjdk extra/jdk21-openjdk extra/jdk23-openjdk`
+                            {
+                                name = "Java21-arch",
+                                path = "/usr/lib/jvm/java-21-openjdk/bin/",
+                            },
+                            {
+                                name = "Java23-arch",
+                                path = "/usr/lib/jvm/java-23-openjdk/bin/",
+                            },
+                            {
+                                name = "Java17-arch",
+                                path = "/usr/lib/jvm/java-17-openjdk/bin/",
+                            },
+                        }
+                    },
+                }
+            },
 
             -- dab (debugging)
             init_options = {
