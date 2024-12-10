@@ -8,7 +8,7 @@ return
     {
         "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
         opts = {
-            ensure_installed = { "taplo", "lua_ls", "jdtls", "marksman", "ruff", "pyright" },
+            ensure_installed = { "lua_ls", "jdtls", "marksman", "ruff", "pyright","taplo"  },
             auto_install = true,
 
             -- use alongside `nvim-jdtls` plugin
@@ -105,7 +105,7 @@ return
             -- setup servers that share same configuration in loop
             local servers = {
                 --"jdtls", -- don't setup jdtls if nvim-jdtls is used
-                "marksman", "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es", "gradle_ls"
+                "marksman", "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es", "gradle_ls", "lemminx"
             }
             for _, lsp in pairs(servers) do
                 lspconfig[lsp].setup {
