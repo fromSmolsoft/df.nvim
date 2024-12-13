@@ -57,7 +57,7 @@ return
                 lualine_a = { "mode" },
                 lualine_b = { "branch", "diff", "diagnostics" },
                 -- lualine_c = { "filename", clients_lsp, "lsp_progress" },
-                lualine_c = { "filename" },
+                lualine_c = { { "filename", path = 1, } },
                 lualine_x = {},
                 lualine_y = { "encoding", "fileformat", "filetype" },
                 lualine_z = { "location" },
@@ -65,15 +65,44 @@ return
             inactive_sections = {
                 lualine_a = {},
                 lualine_b = {},
-                lualine_c = { "filename" },
+                lualine_c = { { "filename", path = 1, } },
                 lualine_x = { "location" },
                 lualine_y = {},
                 lualine_z = {},
             },
             tabline = {},
-            winbar = {},
-            inactive_winbar = {},
-            extensions = {},
+            winbar = {
+                lualine_a = {},
+                lualine_b = {},
+                lualine_c = {},
+                lualine_x = {},
+                lualine_y = {},
+                lualine_z = {}
+            },
+            inactive_winbar = {
+                lualine_a = {},
+                lualine_b = {},
+                lualine_c = {},
+                lualine_x = {},
+                lualine_y = {},
+                lualine_z = {}
+            },
+            extensions = {
+                -- package manger
+                "lazy",
+                "mason",
+
+                -- file explorer
+                "fzf",
+                "neo-tree",
+                "oil",
+
+                -- development
+                "fugitive",
+                "nvim-dap-ui",
+                "trouble",
+                "man",
+            },
         })
     end,
 }
