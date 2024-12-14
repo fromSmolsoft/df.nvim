@@ -91,8 +91,18 @@ return
                 ui.close()
             end
 
-            vim.keymap.set('n', '<Leader>da', ui.open, { desc = "DapUi", noremap = true, })
-            vim.keymap.set('n', '<Leader>db', ui.close, { desc = "close", noremap = true, })
+
+            require("which-key").register({ ["<leader>"] = { d = { name = "Debugger", }, } })
+            -- { { "<leader>d", group = "Debugger" }, }
+
+            local quit_debugger = function()
+                ui.close()
+                vim.notify("Quiting debugger")
+                dap.disconnect({ terminateDebuggee = true })
+            end
+
+            vim.keymap.set('n', '<Leader>dz', ui.open, { desc = "DapUi", noremap = true, })
+            vim.keymap.set('n', '<Leader>dq', quit_debugger, { desc = "Quit debugge", noremap = true, })
             -- vim.keymap.set('n', '<Leader>dw', dapui.toogle, { desc = "toogle", noremap = true, })
 
             -- Intellij keybindings
