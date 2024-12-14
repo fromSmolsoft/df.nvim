@@ -8,7 +8,7 @@ return
     {
         "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
         opts = {
-            ensure_installed = { "lua_ls", "jdtls", "marksman", "ruff", "pyright","taplo"  },
+            ensure_installed = { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
             auto_install = true,
 
             -- use alongside `nvim-jdtls` plugin
@@ -53,7 +53,6 @@ return
     },
     {
         "neovim/nvim-lspconfig", -- https://github.com/neovim/nvim-lspconfig
-        -- lazy = false,
         dependencies = { "folke/neoconf.nvim", "nvim-java/nvim-java", },
         config = function()
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -64,6 +63,16 @@ return
                 callback = function(event)
                     -- keymaps
                     local opts = { buffer = event.buf }
+                    --- create which key groups
+                    local whichkey_groups = function()
+                        local wk = require("which-key")
+                        if wk ~= nil then
+                            wk.add({ "<leader>g", group = "Lsp" })
+                            wk.add({ "<leader>gr", group = "Reference" })
+                            wk.add({ "<leader>c", group = "Code" })
+                        end
+                    end
+                    whichkey_groups()
                     vim.keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
                     vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
                     vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
@@ -105,7 +114,8 @@ return
             -- setup servers that share same configuration in loop
             local servers = {
                 --"jdtls", -- don't setup jdtls if nvim-jdtls is used
-                "marksman", "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es", "gradle_ls", "lemminx"
+                "marksman", "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es", "gradle_ls",
+                "lemminx"
             }
             for _, lsp in pairs(servers) do
                 lspconfig[lsp].setup {
