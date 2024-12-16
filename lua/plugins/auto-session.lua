@@ -3,15 +3,24 @@ return {
     lazy = false,
     dependencies = {
         'nvim-telescope/telescope.nvim',
+        "folke/which-key.nvim",
+        -- FIXME: which-key.nvim groups is not added
+        optional = true,
+        opts = {
+            defaults = {
+                ["<leader>s"] = { name = "Session" },
+            },
+        },
     },
-
     keys = {
-        -- Will use Telescope if installed or a vim.ui.select picker otherwise
-        { '<leader>ls', '<cmd>SessionSearch<CR>',         desc = 'Session search' },
-        { '<leader>ss', '<cmd>SessionSave<CR>',           desc = 'Save session' },
-        { '<leader>ts', '<cmd>SessionToggleAutoSave<CR>', desc = 'Toggle autosave' },
-    },
+        -- require("which-key").add({ "<leader>s", group = "Sessions" }),
 
+        -- Will use Telescope if installed or a vim.ui.select picker otherwise
+        { '<leader>sl', '<cmd>SessionSearch<CR>',         desc = 'Session search' },
+
+        { '<leader>ss', '<cmd>SessionSave<CR>',           desc = 'Save session' },
+        { '<leader>st', '<cmd>SessionToggleAutoSave<CR>', desc = 'Toggle autosave' },
+    },
     opts = {
         auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
         -- ⚠️ This will only work if Telescope.nvim is installed
@@ -26,6 +35,6 @@ return {
                 delete_session = { "i", "<C-D>" },
                 alternate_session = { "i", "<C-S>" },
             },
-        }
-    }
+        },
+    },
 }

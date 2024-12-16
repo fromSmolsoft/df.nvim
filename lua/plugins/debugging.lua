@@ -26,23 +26,6 @@ return
 
             vTxt.setup({ enabled = true, })
 
-            -- java debug FIX: missing dab.adapter.java
-            -- dap.adapters.java = {
-            --     type = 'server',
-            --     host = '127.0.0.1',
-            --     port = 5005,
-            -- }
-            --
-            -- dap.configurations.java = {
-            --     {
-            --         type = 'java',
-            --         name = 'Debug (Attach)',
-            --         request = 'attach',
-            --         hostName = '127.0.0.1',
-            --         port = 5005,
-            --     },
-            -- }
-
             --bash debug
             dap.adapters.bashdb = {
                 type = 'executable',
@@ -73,28 +56,17 @@ return
                 }
             }
 
-
-
             -- dapui
             ui.setup()
+            dap.listeners.before.attach.dapui_config = function() ui.open() end
+            dap.listeners.before.launch.dapui_config = function() ui.open() end
+            dap.listeners.before.event_terminated.dapui_config = function() ui.close() end
+            dap.listeners.before.event_exited.dapui_config = function() ui.close() end
 
-            dap.listeners.before.attach.dapui_config = function()
-                ui.open()
-            end
-            dap.listeners.before.launch.dapui_config = function()
-                ui.open()
-            end
-            dap.listeners.before.event_terminated.dapui_config = function()
-                ui.close()
-            end
-            dap.listeners.before.event_exited.dapui_config = function()
-                ui.close()
-            end
-
-
-            require("which-key").register({ ["<leader>"] = { d = { name = "Debugger", }, } })
-            -- { { "<leader>d", group = "Debugger" }, }
-
+            -- keymaps
+            -- add group for debugger to which-key
+            require("which-key").add({ "<leader>d", group = "Debugger" })
+            -- Close dap_ui and disconnect debug adapter
             local quit_debugger = function()
                 ui.close()
                 vim.notify("Quiting debugger")

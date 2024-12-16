@@ -1,7 +1,5 @@
 return {
     "HampusHauffman/block.nvim",
-    opts= {},
-    -- config = function()
-    --     require("block").setup({})
-    -- end
+    event = "VeryLazy",
+    opts = {},
 }
