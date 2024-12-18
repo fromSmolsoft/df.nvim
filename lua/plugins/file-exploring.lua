@@ -8,15 +8,36 @@ return
             "nvim-lua/plenary.nvim",
             "nvim-tree/nvim-web-devicons",
             "MunifTanjim/nui.nvim",
+            "3rd/image.nvim",
         },
         config = function()
             vim.keymap.set("n", "<C-n>", ":Neotree filesystem toggle reveal left<CR>", {})
             vim.keymap.set("n", "<leader>bf", ":Neotree buffers reveal float<CR>", {})
+
             require("neo-tree").setup {
                 auto_clean_after_session_restore = true, -- Automatically clean up broken neo-tree buffers saved in sessions
                 filesystem = {
-                    group_empty_dirs = true,             -- Concatenate parent directories on path that have no files
-                    scan_mode = "deep",                  -- Needed for group_empty_dirs
+                    -- directories
+                    group_empty_dirs = true, -- Concatenate path without files with only dirs
+                    scan_mode = "deep",      -- Required for group_empty_dirs
+
+                    --- hide/show files/dirs
+                    filtered_items = {
+                        hide_hidden = true, -- Windows specific hidden files
+                        -- hide_dotfiles = false,
+                        hide_by_name = {
+                            ".git", ".gradle",
+                            ".classpath", ".factorypath", ".settings", ".project",
+                            ".idea"
+                        },
+                        hide_by_pattern = { "*.meta", "*/src/*/tsconfig.json", },
+
+                        always_show = { ".gitignored", ".gitattributes", ".bashrc", },
+                        always_show_by_pattern = { "*/dotfiles/.*", },
+
+                        never_show = { ".DS_Store", "thumbs.db", },
+                        never_show_by_pattern = { ".null-ls_*", },
+                    },
                 },
             }
         end,
