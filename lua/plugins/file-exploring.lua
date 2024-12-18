@@ -64,6 +64,16 @@ return
             },
             view_options = {
                 show_hidden = true,
+
+                -- This function defines what is considered a "hidden" file
+                -- example: https://github.com/stevearc/oil.nvim/blob/dba037598843973b8c54bc5ce0318db4a0da439d/doc/recipes.md?plain=1#L109
+                -- is_hidden_file = function(name, bufnr)
+                -- local m = name:match("^%.")
+                -- TODO: do not hide certain files eg. .gitignored
+
+                -- return m ~= nil
+                -- end,
+
             },
             -- custom keymaping
             vim.keymap.set("n", "<leader>o", ":Oil<CR>", { desc = "Oil" })
