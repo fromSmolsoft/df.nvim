@@ -1,5 +1,5 @@
 local api = vim.api
-
+local TIMEOUT = 3600;
 -- Highlight when yanking
 api.nvim_create_autocmd("TextYankPost", {
     callback = function()
@@ -7,7 +7,6 @@ api.nvim_create_autocmd("TextYankPost", {
     end,
 })
 
--- TODO: terminal enable "normal" mode by Esc
 
 -- Jump to last postion v3  [source nvim issue 16339](https://github.com/neovim/neovim/issues/16339#issuecomment-1457394370)
 api.nvim_create_autocmd('BufRead', {
@@ -29,6 +28,24 @@ api.nvim_create_autocmd('BufRead', {
         })
     end,
 })
+
+-- TODO: autosave on timer,focus loss, if inside `.git` repository
+-- local autoSaveGrp = api.nvim_create_augroup("AutoSaveGrp", { clear = true })
+-- api.nvim_create_autocmd(
+-- -- event
+--     {},
+--     {
+--         -- pattern only edited unsaved and save-able buffers
+--         pattern = "*",
+--         --- action taken
+--         callback = function()
+--         end,
+--         group = autoSaveGrp,
+--         desc = "AutoSaveOnTimer",
+--     })
+
+-- TODO: terminal enable "normal" mode by Esc
+
 
 -- Jump to last position v2
 -- -- adapted from https://github.com/ethanholz/nvim-lastplace/blob/main/lua/nvim-lastplace/init.lua

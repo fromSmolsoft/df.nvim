@@ -32,7 +32,7 @@ return
                         },
                         hide_by_pattern = { "*.meta", "*/src/*/tsconfig.json", },
 
-                        always_show = { ".gitignored", ".gitattributes", ".bashrc", },
+                        always_show = { ".gitignore", ".gitattributes", ".bashrc", },
                         always_show_by_pattern = { "*/dotfiles/.*", },
 
                         never_show = { ".DS_Store", "thumbs.db", },
