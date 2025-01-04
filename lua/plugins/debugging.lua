@@ -78,17 +78,17 @@ return
             -- vim.keymap.set('n', '<Leader>dw', dapui.toogle, { desc = "toogle", noremap = true, })
 
             -- Intellij keybindings
-            vim.keymap.set('n', '<F9>', dap.continue, { desc = "DAP continue", noremap = true, })
-            vim.keymap.set('n', '<F8>', dap.step_over, { desc = "DAP stepover", noremap = true, })
             vim.keymap.set('n', '<F7>', dap.step_into, { desc = "DAP stepinto", noremap = true, })
+            vim.keymap.set('n', '<F8>', dap.step_over, { desc = "DAP stepover", noremap = true, })
             vim.keymap.set('n', '<S-F8>', dap.step_out, { desc = "DAP stepout", noremap = true, })
+            vim.keymap.set('n', '<F9>', dap.continue, { desc = "DAP continue", noremap = true, })
 
             -- vimkeys
             vim.keymap.set('n', '<Leader>dc', dap.continue, { desc = "DAP continue", noremap = true, })
             vim.keymap.set('n', '<Leader>ds', dap.step_over, { desc = "DAP stepover", noremap = true, })
             vim.keymap.set('n', '<Leader>di', dap.step_into, { desc = "DAP stepinto", noremap = true, })
             vim.keymap.set('n', '<Leader>do', dap.step_out, { desc = "DAP stepout", noremap = true, })
-            vim.keymap.set('n', '<Leader>dt', dap.toggle_breakpoint, { desc = "Break point toogle", noremap = true, })
+            vim.keymap.set('n', '<Leader>db', dap.toggle_breakpoint, { desc = "Break point toogle", noremap = true, })
         end,
     },
 
