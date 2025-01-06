@@ -12,7 +12,7 @@ return {
     },
     {
         "doums/darcula",
-        enabled = false,
+        enabled = true,
         lazy = false,
         -- priority = 1000,
         name = "darcula",

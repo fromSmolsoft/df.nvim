@@ -111,12 +111,18 @@ return
                     -- vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.lsp.buf.document_highlight(nil, {focus=false, scope="cursor"})]]
                 end
             })
-            -- setup servers that share same configuration in loop
+
+            -- list of servers sharing same (default) configuration
             local servers = {
                 --"jdtls", -- don't setup jdtls if nvim-jdtls is used
-                "marksman", "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es", "gradle_ls",
-                "lemminx"
+                "marksman",
+                "pyright", "ruff",
+                "ts_ls", "html", "bashls",
+                "taplo", "powershell_es",
+                "gradle_ls",
+                "lemminx",
             }
+
             for _, lsp in pairs(servers) do
                 lspconfig[lsp].setup {
                     capabilities = capabilities,
@@ -127,6 +133,16 @@ return
                 }
             end
 
+            -- sqls custom config (requires db connection)
+            -- lspconfig.sqls.setup({
+            --     on_attach = function(client, _)
+            --         capabilities = capabilities
+            --         client.server_capabilities.documentFormattingProvider = false
+            --         client.server_capabilities.documentRangeFormattingProvider = false
+            --     end,
+            -- })
+
+            -- lua_ls custom config
             lspconfig.lua_ls.setup({
                 capabilities = capabilities,
                 settings = {
@@ -161,16 +177,42 @@ return
         dependencies = { "nvim-lua/plenary.nvim", lazy = true },
         config = function()
             local null_ls = require("null-ls")
+            local sql_ft = { "sql", }
+            local sqlfluff_args = { "--dialect", "postgres" }
+            local groovy = { "groovy", "Jenkinsfile" }
+            local prettier_ft = {
+                "javascript", "javascriptreact", "typescript", "typescriptreact",
+                "css", "scss", "less", "html", "htmlangular",
+                "json", "jsonc", "yaml",
+                "markdown", "markdown.mdx", "graphql", "handlebars",
+                "svelte", "vue", "astro"
+            }
+            local sh_ft = { "sh", }
+
             null_ls.setup({
                 sources = {
-                    -- formatting
-                    null_ls.builtins.formatting.prettier,    -- angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
-                    null_ls.builtins.formatting.npm_groovy_lint.with({ filetypes = { "groovy", "Jenkinsfile" } }),
-                    null_ls.builtins.formatting.shellharden, -- bash
-                    null_ls.builtins.formatting.shfmt,       -- bash
 
-                    -- diagnostics
-                    null_ls.builtins.diagnostics.npm_groovy_lint.with({ filetypes = { "groovy", "Jenkinsfile" } }), -- groovy, filetypes has to specifically not include java or it lints Java in weird way
+                    -- formatting --
+                    null_ls.builtins.formatting.prettier.with({ filetypes = prettier_ft }),
+                    null_ls.builtins.formatting.npm_groovy_lint.with({ filetypes = groovy }),
+
+                    null_ls.builtins.formatting.shellharden.with({ filetypes = sh_ft }),
+                    null_ls.builtins.formatting.shfmt.with({ filetypes = sh_ft }),
+
+                    null_ls.builtins.formatting.sqlfluff.with({
+                        filetypes = sql_ft,
+                        extra_args = sqlfluff_args, -- change to your dialect
+                    }),
+
+                    -- diagnostics --
+                    null_ls.builtins.diagnostics.npm_groovy_lint.with({
+                        filetypes = groovy,
+                        disabled_filetypes = { "java" }, -- filetypes has to specifically not include java or it lints Java in weird way
+                    }),
+                    null_ls.builtins.diagnostics.sqlfluff.with({
+                        filetypes = sql_ft,
+                        extra_args = sqlfluff_args, -- change to your dialect
+                    }),
 
                     -- null_ls.builtins.diagnostics.shellcheck,      -- deprecated,  bash
 
