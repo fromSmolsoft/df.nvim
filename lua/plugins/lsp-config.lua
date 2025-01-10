@@ -1,54 +1,85 @@
 return
 {
     {
-        "williamboman/mason.nvim",
-        lazy = false,
+        "williamboman/mason.nvim", -- https://github.com/williamboman/mason.nvim
         opts = {},
-        config = function(_, opts)
-            require("mason").setup(opts)
-        end,
+        -- config = function(_, opts) require("mason").setup(opts) end, -- lazy automatically calls require("...").setup with opts if either opts or config is defined
     },
     {
-        "williamboman/mason-lspconfig.nvim",
-        lazy = false,
+        "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
         opts = {
-            ensure_installed = { "taplo", "lua_ls", "jdtls", "marksman", "ruff", "pyright" },
+            ensure_installed = { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
             auto_install = true,
+
+            -- use alongside `nvim-jdtls` plugin
+            function(server_name)
+                -- skip jdtls setup by mason-lspconfig.nvim
+                if server_name == "jdtls" then
+                    --[[ if require("lazy.core.config").plugins["nvim-jdtls"]._.kind == "normal" then
+                        vim.notify("nvim-jdtls enabled")
+                    else
+                        vim.notify("nvim-jdtls disabled")
+                    end --]]
+                    return true
+                end
+            end
         },
-        config = function(_, opts)
-            require("mason-lspconfig").setup(opts)
+        -- config = function(_, opts) require("mason-lspconfig").setup(opts) end
+    },
+    {
+        "nvim-java/nvim-java", -- https://github.com/nvim-java/nvim-java
+        enabled = false,       -- not to be used alongside nvim-jdtls
+        -- FIX: trows error when configuring dap despite dap being diabled
+        -- FIX: Gradle project resolve imports can't be resolved etc.
+        config = function()
+            require('java').setup({
+                java_debug_adapter = { enable = false, },
+            })
         end
     },
     {
-        "neovim/nvim-lspconfig",
-        lazy = false,
+        -- Allows switching between custom lsp configurations per project or globally by loading json
+        "folke/neoconf.nvim", -- https://github.com/folke/neoconf.nvim
+        enabled = false,
+        opts = {
+            --   - global settings: ~/.config/nvim/neoconf.json
+            --   - local settings: ~/projects/foobar/.neoconf.json
+        },
+        -- config = function()
+        --     require("neoconf").setup({
+        --         -- override any of the default settings here
+        --     })
+        -- end
+    },
+    {
+        "neovim/nvim-lspconfig", -- https://github.com/neovim/nvim-lspconfig
+        dependencies = { "folke/neoconf.nvim", "nvim-java/nvim-java", },
         config = function()
-            -- capabilities: deprecated but `usePlaceholders` work eg. `prin` auto-completes to  `print()`
-            -- local capabilities = vim.lsp.protocol.make_client_capabilities()
-            -- capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
-
-            -- capabilities: new way, no need for `make_client_capabilities()`
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             capabilities.textDocument.completion.completionItem.snippetSupport = true
-
             local lspconfig = require("lspconfig")
-
             vim.api.nvim_create_autocmd("LspAttach", {
                 desc = "Lsp Actions",
                 callback = function(event)
-                    print("Lsp Attached")
-
                     -- keymaps
                     local opts = { buffer = event.buf }
+                    --- create which key groups
+                    local whichkey_groups = function()
+                        local wk = require("which-key")
+                        if wk ~= nil then
+                            wk.add({ "<leader>g", group = "Lsp" })
+                            wk.add({ "<leader>gr", group = "Reference" })
+                            wk.add({ "<leader>c", group = "Code" })
+                        end
+                    end
+                    whichkey_groups()
                     vim.keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
-
                     vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
                     vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
                     vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
                     vim.keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
                     vim.keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
                     vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
-
                     -- configure lsp in-line diagnostics
                     vim.diagnostic.config({
                         severity_sort = true,
@@ -59,21 +90,18 @@ return
                             source = "if_many"
                         },
                     })
-
                     -- floating window diagnostics
                     vim.o.updatetime = 250
                     vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
-
                     -- toggling diagnostics
                     local function togle_diagnostics()
                         if vim.diagnostic.is_enabled() then
                             vim.diagnostic.enable(false)
                             vim.diagnostic.reset()
-                            vim.notify("diagnostics disabled") --print to status bar
+                            vim.notify("𐄂 Diagnostics disabled") --print to status bar
                         else
                             vim.diagnostic.enable(true)
-                            vim.notify("diagnostics enabled")
-                            -- Show line diagnostics automatically in hover window
+                            vim.notify("✅ Diagnostics enabled")
                         end
                     end
 
@@ -84,12 +112,17 @@ return
                 end
             })
 
-            -- setup servers that share same configuration in loop
+            -- list of servers sharing same (default) configuration
             local servers = {
+                --"jdtls", -- don't setup jdtls if nvim-jdtls is used
                 "marksman",
-                --"jdtls", -- jdtls has it's own plugin
-                "pyright", "ruff", "ts_ls", "html", "bashls", "taplo", "sqls", "powershell_es",
-                "gradle_ls" }
+                "pyright", "ruff",
+                "ts_ls", "html", "bashls",
+                "taplo", "powershell_es",
+                "gradle_ls",
+                "lemminx",
+            }
+
             for _, lsp in pairs(servers) do
                 lspconfig[lsp].setup {
                     capabilities = capabilities,
@@ -100,7 +133,16 @@ return
                 }
             end
 
-            -- individual server configuration
+            -- sqls custom config (requires db connection)
+            -- lspconfig.sqls.setup({
+            --     on_attach = function(client, _)
+            --         capabilities = capabilities
+            --         client.server_capabilities.documentFormattingProvider = false
+            --         client.server_capabilities.documentRangeFormattingProvider = false
+            --     end,
+            -- })
+
+            -- lua_ls custom config
             lspconfig.lua_ls.setup({
                 capabilities = capabilities,
                 settings = {
@@ -109,53 +151,68 @@ return
                             -- Most likely not needed anymore due to capabilities' config
                             usePlaceholders = true,
                         },
-                        diagnostics = {
-                            globals = { "vim", "describe", "it", "before_each", "after_each" },
-                        },
+                        diagnostics = { globals = { "vim", "describe", "it", "before_each", "after_each" }, },
                         workspace = {
                             -- Make the server aware of Neovim runtime files
                             library = vim.api.nvim_get_runtime_file("", true),
                         },
 
                         -- By default, lua-language-server sends anonymized data to its developers. Stop it using the following.
-                        telemetry = {
-                            enable = false,
-                        },
+                        telemetry = { enable = false, },
                     },
                 },
             })
         end,
     },
-
     {
         "ray-x/lsp_signature.nvim", -- Show doc strings upon hover
-        -- FIX: Hover doesn't show doc-string, status bar writes "No information available"
         enabled = true,
         event = "VeryLazy",
         opts = {},
-        config = function(_, opts)
-            require "lsp_signature".setup(opts)
-        end,
+        -- config = function(_, opts) require "lsp_signature".setup(opts) end,
     },
-
     {
         "nvimtools/none-ls.nvim", -- provides hook for non-lsp tools to hook into its lsp client (linters,formatters,..)
         enabled = true,
-        dependencies = {
-            "nvim-lua/plenary.nvim",
-        },
+        dependencies = { "nvim-lua/plenary.nvim", lazy = true },
         config = function()
             local null_ls = require("null-ls")
+            local sql_ft = { "sql", }
+            local sqlfluff_args = { "--dialect", "postgres" }
+            local groovy = { "groovy", "Jenkinsfile" }
+            local prettier_ft = {
+                "javascript", "javascriptreact", "typescript", "typescriptreact",
+                "css", "scss", "less", "html", "htmlangular",
+                "json", "jsonc", "yaml",
+                "markdown", "markdown.mdx", "graphql", "handlebars",
+                "svelte", "vue", "astro"
+            }
+            local sh_ft = { "sh", }
+
             null_ls.setup({
                 sources = {
-                    -- formatting
-                    -- null_ls.builtins.formatting.stylua, -- lua
-                    null_ls.builtins.formatting.prettier,    -- angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
-                    null_ls.builtins.formatting.shellharden, -- bash
-                    null_ls.builtins.formatting.shfmt,       -- bash
 
-                    -- diagnostics
-                    null_ls.builtins.diagnostics.npm_groovy_lint.with({ filetypes = { "groovy", "Jenkinsfile" } }), -- groovy, filetypes has to specifically not include java or it lints Java in weird way
+                    -- formatting --
+                    null_ls.builtins.formatting.prettier.with({ filetypes = prettier_ft }),
+                    null_ls.builtins.formatting.npm_groovy_lint.with({ filetypes = groovy }),
+
+                    null_ls.builtins.formatting.shellharden.with({ filetypes = sh_ft }),
+                    null_ls.builtins.formatting.shfmt.with({ filetypes = sh_ft }),
+
+                    null_ls.builtins.formatting.sqlfluff.with({
+                        filetypes = sql_ft,
+                        extra_args = sqlfluff_args, -- change to your dialect
+                    }),
+
+                    -- diagnostics --
+                    null_ls.builtins.diagnostics.npm_groovy_lint.with({
+                        filetypes = groovy,
+                        disabled_filetypes = { "java" }, -- filetypes has to specifically not include java or it lints Java in weird way
+                    }),
+                    null_ls.builtins.diagnostics.sqlfluff.with({
+                        filetypes = sql_ft,
+                        extra_args = sqlfluff_args, -- change to your dialect
+                    }),
 
                     -- null_ls.builtins.diagnostics.shellcheck,      -- deprecated,  bash
 

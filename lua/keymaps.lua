@@ -14,3 +14,6 @@ vkey.set('n', '<c-l>', ':wincmd l<CR>', { desc = "Go to right pane" })
 vkey.set('n', '<leader>z', ':tabedit %<CR>', { desc = "Max active split in a new tab" })
 vkey.set('n', '<leader>bd', ':%bd|e#<CR>', { desc = "Close saved buffers" })
 vkey.set('n', '<leader>*', '*#:%s///gc<left><left><left>', { desc = "Search & replace" })
+
+vkey.set('n', '<leader>co', ':windo diffthis<CR>', { desc = "Diff splits" })
+vkey.set('n', '<leader>cx', ':windo diffoff<CR>', { desc = "Diff off" })

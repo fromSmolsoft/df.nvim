@@ -14,24 +14,25 @@ return {
                         -- vertical = { width = 0.9, height = 0,95 },
                     }
                 },
-                extensions = {
-                    ["ui-select"] = {
-                        require("telescope.themes").get_dropdown({}),
-                    },
+                extensions = { ["ui-select"] = { require("telescope.themes").get_dropdown({}), },
                 },
             })
 
 
             -- Keymaping
+
+            require("which-key").add({ "<leader>f", group = "Find" })
+
             local builtin = require("telescope.builtin")
 
             -- Find
-            vim.keymap.set("n", "<C-p>", builtin.find_files, { desc = "Find files" })
-            vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
-            vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "Find cmd" })
-            vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffers" })
+            vim.keymap.set("n", "<C-p>", builtin.find_files, { desc = "Find file" })
+            vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find file" })
+            vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "Find command" })
+            vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffer" })
             vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Find in files" })
-            vim.keymap.set("n", "<leader><leader>", builtin.oldfiles, { desc = "Find oldFiles" })
+            vim.keymap.set("n", "<leader><leader>", ":Telescope oldfiles cwd_only=true<CR>", { desc = "Find oldFile" })
+            vim.keymap.set("n", "<leader>fo", ":Telescope oldfiles cwd_only=true<CR>", { desc = "Find oldFile" })
 
             -- Git
             vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Git commits" })

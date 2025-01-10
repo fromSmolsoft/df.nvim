@@ -8,6 +8,15 @@ return
             "theHamsta/nvim-dap-virtual-text",
             "nvim-neotest/nvim-nio",
             "williamboman/mason.nvim",
+            opts = {
+                -- attempt at fixing java-nvim dap
+                -- registries = {
+                --     'github:nvim-java/mason-registry',
+                --     'github:mason-org/mason-registry',
+                -- },
+                ensure_installed = { "java-debug-adapter", "java-test" }
+            },
+
         },
 
         config = function()
@@ -15,7 +24,7 @@ return
             local ui = require("dapui")
             local vTxt = require("nvim-dap-virtual-text")
 
-            vTxt.setup()
+            vTxt.setup({ enabled = true, })
 
             --bash debug
             dap.adapters.bashdb = {
@@ -23,7 +32,6 @@ return
                 command = vim.fn.stdpath("data") .. '/mason/packages/bash-debug-adapter/bash-debug-adapter',
                 name = 'bashdb',
             }
-
 
             dap.configurations.sh = {
                 {
@@ -48,40 +56,39 @@ return
                 }
             }
 
-
-
             -- dapui
             ui.setup()
+            dap.listeners.before.attach.dapui_config = function() ui.open() end
+            dap.listeners.before.launch.dapui_config = function() ui.open() end
+            dap.listeners.before.event_terminated.dapui_config = function() ui.close() end
+            dap.listeners.before.event_exited.dapui_config = function() ui.close() end
 
-            dap.listeners.before.attach.dapui_config = function()
-                ui.open()
-            end
-            dap.listeners.before.launch.dapui_config = function()
-                ui.open()
-            end
-            dap.listeners.before.event_terminated.dapui_config = function()
+            -- keymaps
+            -- add group for debugger to which-key
+            require("which-key").add({ "<leader>d", group = "Debugger" })
+            -- Close dap_ui and disconnect debug adapter
+            local quit_debugger = function()
                 ui.close()
-            end
-            dap.listeners.before.event_exited.dapui_config = function()
-                ui.close()
+                vim.notify("Quiting debugger")
+                dap.disconnect({ terminateDebuggee = true })
             end
 
-            vim.keymap.set('n', '<Leader>da', ui.open, { desc = "DapUi", noremap = true, })
-            vim.keymap.set('n', '<Leader>db', ui.close, { desc = "close", noremap = true, })
+            vim.keymap.set('n', '<Leader>dz', ui.open, { desc = "DapUi", noremap = true, })
+            vim.keymap.set('n', '<Leader>dq', quit_debugger, { desc = "Quit debugge", noremap = true, })
             -- vim.keymap.set('n', '<Leader>dw', dapui.toogle, { desc = "toogle", noremap = true, })
 
             -- Intellij keybindings
-            vim.keymap.set('n', '<F9>', dap.continue, { desc = "DAP continue", noremap = true, })
-            vim.keymap.set('n', '<F8>', dap.step_over, { desc = "DAP stepover", noremap = true, })
             vim.keymap.set('n', '<F7>', dap.step_into, { desc = "DAP stepinto", noremap = true, })
+            vim.keymap.set('n', '<F8>', dap.step_over, { desc = "DAP stepover", noremap = true, })
             vim.keymap.set('n', '<S-F8>', dap.step_out, { desc = "DAP stepout", noremap = true, })
+            vim.keymap.set('n', '<F9>', dap.continue, { desc = "DAP continue", noremap = true, })
 
             -- vimkeys
             vim.keymap.set('n', '<Leader>dc', dap.continue, { desc = "DAP continue", noremap = true, })
             vim.keymap.set('n', '<Leader>ds', dap.step_over, { desc = "DAP stepover", noremap = true, })
             vim.keymap.set('n', '<Leader>di', dap.step_into, { desc = "DAP stepinto", noremap = true, })
             vim.keymap.set('n', '<Leader>do', dap.step_out, { desc = "DAP stepout", noremap = true, })
-            vim.keymap.set('n', '<Leader>dt', dap.toggle_breakpoint, { desc = "Break point toogle", noremap = true, })
+            vim.keymap.set('n', '<Leader>db', dap.toggle_breakpoint, { desc = "Break point toogle", noremap = true, })
         end,
     },
 
