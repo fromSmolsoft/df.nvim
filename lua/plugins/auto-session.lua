@@ -2,7 +2,7 @@ return {
     "rmagatti/auto-session",
     lazy = false,
     dependencies = {
-        'nvim-telescope/telescope.nvim',
+        "nvim-telescope/telescope.nvim",
         "folke/which-key.nvim",
         -- FIXME: which-key.nvim groups is not added
         optional = true,
@@ -16,13 +16,13 @@ return {
         -- require("which-key").add({ "<leader>s", group = "Sessions" }),
 
         -- Will use Telescope if installed or a vim.ui.select picker otherwise
-        { '<leader>sl', '<cmd>SessionSearch<CR>',         desc = 'Session search' },
-
-        { '<leader>ss', '<cmd>SessionSave<CR>',           desc = 'Save session' },
-        { '<leader>st', '<cmd>SessionToggleAutoSave<CR>', desc = 'Toggle autosave' },
+        { "<leader>sl", "<cmd>SessionSearch<CR>",         desc = "Session search" },
+        { "<leader>ss", "<cmd>SessionSave<CR>",           desc = "Save session" },
+        { "<leader>st", "<cmd>SessionToggleAutoSave<CR>", desc = "Toggle autosave" },
     },
     opts = {
-        auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
+        lazy_support = true,
+        suppressed_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
         -- ⚠️ This will only work if Telescope.nvim is installed
         -- The following are already the default values, no need to provide them if these are already the settings you want.
         session_lens = {
