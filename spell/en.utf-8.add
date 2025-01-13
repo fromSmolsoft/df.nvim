@@ -18,3 +18,5 @@ catppuccin
 config
 github
 tmux
+inotify
+inotifywait
