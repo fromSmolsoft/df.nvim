@@ -26,7 +26,7 @@ return {
         "hrsh7th/nvim-cmp",
         config = function()
             local cmp = require("cmp")
-            local neogen = require('neogen')
+            local neogen = require("neogen")
             require("luasnip.loaders.from_vscode").lazy_load()
 
             cmp.setup({
@@ -62,12 +62,20 @@ return {
                         end
                     end, { "i", "s", }),
                 }),
-                sources = cmp.config.sources({
+                sources = cmp.config.sources(
+                    {
                         { name = "nvim_lsp" },
                         { name = "luasnip" }, -- For luasnip users.
-                        { name = 'nvim_lsp_signature_help' },
-                    },
-                    { { name = "buffer" }, }),
+                        { name = "nvim_lsp_signature_help" },
+                        { name = "buffer" }, }),
+            })
+
+            -- vim-dadbod (autocompletion when accessing databases)
+            cmp.setup.filetype({ "sql", "sql", "mysql", "plsql" }, {
+                sources = {
+                    { name = "vim-dadbod-completion" },
+                    { name = "buffer" }
+                }
             })
         end,
         dependencies = {
