@@ -62,12 +62,11 @@ return {
                         end
                     end, { "i", "s", }),
                 }),
-                sources = cmp.config.sources(
-                    {
-                        { name = "nvim_lsp" },
-                        { name = "luasnip" }, -- For luasnip users.
-                        { name = "nvim_lsp_signature_help" },
-                        { name = "buffer" }, }),
+                sources = cmp.config.sources({
+                    { name = "nvim_lsp" },
+                    { name = "luasnip" }, -- For luasnip users.
+                    { name = "nvim_lsp_signature_help" },
+                    { name = "buffer" }, }),
             })
 
             -- vim-dadbod (autocompletion when accessing databases)
