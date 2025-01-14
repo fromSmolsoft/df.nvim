@@ -13,11 +13,14 @@ return {
     },
     {
         {
-            --- Create annotations, https://github.com/danymat/neogen
+            --- Create annotations. https://github.com/danymat/neogen
             "danymat/neogen",
-            config = true,
-            -- Uncomment next line if you want to follow only stable versions
-            version = "*",
+            config = function()
+                vim.keymap.set(
+                    "n", "<Leader>cn", ":lua require('neogen').generate()<CR>",
+                    { noremap = true, silent = true, desc = "Generate annotation (neogen)" })
+            end,
+            version = "*", -- "*" is stable versions
         }
 
     },
