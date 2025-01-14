@@ -1,8 +1,8 @@
 return {
     "Exafunction/codeium.nvim", -- https://github.com/Exafunction/codeium.nvim
     event = "VeryLazy",
-    enabled = true,
-    -- FIXME: inline hints / autocompletion not working
+    enabled = false,
+    -- FIXME: inline hints  not working
     dependencies = {
         "nvim-lua/plenary.nvim",
         "hrsh7th/nvim-cmp",
