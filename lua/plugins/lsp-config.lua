@@ -38,7 +38,7 @@ return
         end
     },
     {
-        -- Allows switching between custom lsp configurations per project or globally by loading json
+        --- Allows switching between custom lsp configurations per project or globally by loading json
         "folke/neoconf.nvim", -- https://github.com/folke/neoconf.nvim
         enabled = false,
         opts = {

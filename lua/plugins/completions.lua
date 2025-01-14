@@ -25,7 +25,7 @@ return {
 
     },
     {
-        -- gitcommit autocompletion
+        --- gitcommit autocompletion
         "petertriho/cmp-git",
         -- ft = { "gitcommit", "octo", "NeogitCommitMessage" },
         opt = {},
@@ -89,7 +89,7 @@ return {
                     { name = 'buffer' },
                 })
             })
-            -- vim-dadbod (autocompletion when accessing databases)
+            -- databases, sql... , plugin vim-dadbod (autocompletion when accessing databases)
             cmp.setup.filetype({ "sql", "mysql", "plsql" }, {
                 sources = cmp.config.sources({
                         { name = "nvim_lsp" },
