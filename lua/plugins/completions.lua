@@ -22,8 +22,20 @@ return {
 
     },
     {
+        -- gitcommit autocompletion
+        "petertriho/cmp-git",
+        -- ft = { "gitcommit", "octo", "NeogitCommitMessage" },
+        opt = {},
+        init = function()
+            table.insert(require("cmp").get_config().sources, { name = "git" })
+        end
+
+    },
+
+    {
         --- A completion engine, https://github.com/hrsh7th/nvim-cmp
         "hrsh7th/nvim-cmp",
+        event = { "InsertEnter" },
         config = function()
             local cmp = require("cmp")
             local neogen = require("neogen")
@@ -62,24 +74,59 @@ return {
                         end
                     end, { "i", "s", }),
                 }),
+
+                -- https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources
                 sources = cmp.config.sources({
                     { name = "nvim_lsp" },
                     { name = "luasnip" }, -- For luasnip users.
                     { name = "nvim_lsp_signature_help" },
-                    { name = "buffer" }, }),
+                    { name = "path" },
+                    { name = "codeium" },
+                }, {
+                    { name = 'buffer' },
+                })
+            })
+            -- vim-dadbod (autocompletion when accessing databases)
+            cmp.setup.filetype({ "sql", "mysql", "plsql" }, {
+                sources = cmp.config.sources({
+                        { name = "nvim_lsp" },
+                        { name = "vim-dadbod-completion" },
+                        { name = 'sql' },
+                        { name = "codeium" },
+                    },
+                    { { name = 'buffer' }, })
             })
 
-            -- vim-dadbod (autocompletion when accessing databases)
-            cmp.setup.filetype({ "sql", "sql", "mysql", "plsql" }, {
-                sources = {
-                    { name = "vim-dadbod-completion" },
-                    { name = "buffer" }
-                }
+            -- git
+            cmp.setup.filetype({ "gitcommit", "octo", "NeogitCommitMessage" }, {
+
+                sources = cmp.config.sources({
+                        { name = "nvim_lsp" },
+                        { name = 'git' },
+                        { name = "codeium" },
+                    },
+                    { { name = 'buffer' },
+                    }),
+            })
+
+            -- tmux
+            cmp.setup.filetype({ "tmux" }, {
+                sources = cmp.config.sources({
+                        { name = 'tmux' },
+                        { name = "codeium" },
+                        { name = "path" },
+                    },
+                    { { name = 'buffer' }, })
             })
         end,
         dependencies = {
             "hrsh7th/cmp-nvim-lsp-signature-help",
             "L3MON4D3/LuaSnip",
+
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
+            { "ray-x/cmp-sql",          ft = { "sql", "mysql", "plsql" } },
+            { "andersevenrud/cmp-tmux", ft = { "tmux" } }, -- tmux
         },
     },
 }
