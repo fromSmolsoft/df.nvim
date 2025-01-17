@@ -13,8 +13,8 @@ end;
 return {
     --- Codeium ai assistant
     "Exafunction/codeium.nvim", -- https://github.com/Exafunction/codeium.nvim
-    keys = { { "<leader>ct", enable_codeium, desc = "Codeium: enabled" }, },
-    event = "VeryLazy",
+    keys = { { "<leader>cac", enable_codeium, desc = "Codeium: enabled" }, },
+    -- event = "VeryLazy",
     -- cond = l_loaded,
     -- FIXME: inline hints  not working
     dependencies = {
