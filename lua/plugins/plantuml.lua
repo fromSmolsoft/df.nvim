@@ -1,6 +1,39 @@
 return
 {
     {
+        -- puml syntax (vim script plugin). https://github.com/aklt/plantuml-syntax
+        "aklt/plantuml-syntax",
+        enabled = false,
+        opts = {},
+    },
+    {
+        'https://gitlab.com/itaranto/preview.nvim',
+        even = "VeryLazy",
+        ft = { "plantuml", },
+        version = '*',
+        opts = {
+            -- Your options.
+            previewers_by_ft = {
+                plantuml = {
+                    name = 'plantuml_svg',
+                    renderer = { type = 'command', opts = { cmd = { 'feh' } }
+                    },
+
+                    --  FIXME: trows e...
+                    -- plantuml = { name = 'plantuml_text', renderer = { type = 'buffer', opts = { split_cmd = 'split' } }, },
+
+                    -- markdown = { name = 'pandoc_wkhtmltopdf', renderer = { type = 'command', opts = { cmd = { 'zathura' } } }, },
+                },
+            },
+            previewers = {
+                plantuml_svg = {
+                    args = { '-pipe', '-tpng' },
+                },
+            },
+            render_on_write = true,
+        }
+    },
+    {
         -- TODO: activate shortcuts only for plantuml file type
         -- config = function()
         --     vim.api.nvim_create_autocmd("FileType", {
