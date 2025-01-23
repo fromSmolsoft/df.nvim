@@ -3,7 +3,6 @@ return
     {
         "williamboman/mason.nvim", -- https://github.com/williamboman/mason.nvim
         opts = {},
-        -- config = function(_, opts) require("mason").setup(opts) end, -- lazy automatically calls require("...").setup with opts if either opts or config is defined
     },
     {
         "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
@@ -177,9 +176,12 @@ return
         dependencies = { "nvim-lua/plenary.nvim", lazy = true },
         config = function()
             local null_ls = require("null-ls")
+
+
             local sql_ft = { "sql", }
             local sqlfluff_args = { "--dialect", "postgres" }
             local groovy = { "groovy", "Jenkinsfile" }
+            local markdown = { "markdown", "org" }
             local prettier_ft = {
                 "javascript", "javascriptreact", "typescript", "typescriptreact",
                 "css", "scss", "less", "html", "htmlangular",
@@ -189,11 +191,61 @@ return
             }
             local sh_ft = { "sh", }
 
+            -- key is none_ls builtins', value is package name in mason_registry. Packages can be duplicated.
+            local builtins_to_mason = {
+
+                -- formatters
+                prettier = "prettier",
+                cbfmt = "cbfmt",
+                npm_groovy_lint = "npm-groovy-lint",
+                shellharden = "shellharden",
+                shfmt = "shfmt",
+                sqlfluff = "sqlfluff",
+
+                -- diagnostics
+                npm_groovy_lint = "npm-groovy-lint",
+                sqlfluff = "sqlfluff",
+
+                -- code_actions
+                "gitsigns", -- not in mason_registry
+
+                -- hovers
+                "printenv", -- not in mason_registry
+            }
+
+            local mason_registry = require("mason-registry")
+            local missing_mason_packages, missing_mason_packages_msg = {}, "Missing packages: "
+
+            --- in given list find Mason packages that were not yet installed
+            --- @param tools to ensure being installed
+            local function get_missing_packages(tools)
+                for _, value in pairs(tools) do
+                    if (mason_registry.has_package(value) and not mason_registry.is_installed(value)) then
+                        missing_mason_packages[#missing_mason_packages + 1] = value
+                        missing_mason_packages_msg = missing_mason_packages_msg .. value .. ", "
+                    end
+                end
+            end
+
+            get_missing_packages(builtins_to_mason)
+
+            --- Install mason given packages command `MasonInstall `
+            --- @param packages list of packages to be installed
+            local function install_mason_packages(packages)
+                if #packages > 0 then
+                    vim.notify(missing_mason_packages_msg)
+                    vim.cmd { cmd = "MasonInstall", args = packages }
+                end
+            end
+
+            install_mason_packages(missing_mason_packages)
+
             null_ls.setup({
                 sources = {
 
                     -- formatting --
                     null_ls.builtins.formatting.prettier.with({ filetypes = prettier_ft }),
+                    null_ls.builtins.formatting.cbfmt.with({ filetypes = markdown }), -- format code blocks in markdown``
                     null_ls.builtins.formatting.npm_groovy_lint.with({ filetypes = groovy }),
 
                     null_ls.builtins.formatting.shellharden.with({ filetypes = sh_ft }),
