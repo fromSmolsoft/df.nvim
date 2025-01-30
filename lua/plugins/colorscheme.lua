@@ -1,7 +1,7 @@
 return {
     {
         "catppuccin/nvim",
-        enabled = true,
+        cond = true,
         lazy = false,
         name = "catppuccin",
         priority = 1000,
@@ -12,21 +12,21 @@ return {
     },
     {
         "doums/darcula",
-        enabled = true,
+        cond = true,
         lazy = false,
         -- priority = 1000,
         name = "darcula",
     },
     {
         "folke/tokyonight.nvim",
-        enabled = false,
+        cond = false,
         lazy = false,
         -- priority = 1000,
         opts = {},
     },
     {
         "navarasu/onedark.nvim",
-        enabled = false,
+        cond = false,
         -- priority = 1000,
         opts = {},
     }

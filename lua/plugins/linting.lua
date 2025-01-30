@@ -1,6 +1,6 @@
 return {
     "mfussenegger/nvim-lint",
-    enabled = false, -- null-ls deprecated shellcheck, purpose of this plugin was to lint `bash` but `shellcheck` seems to be linting regardless any plugin configuring => disabling the plugin for tim e
+    cond = false, -- null-ls deprecated shellcheck, purpose of this plugin was to lint `bash` but `shellcheck` seems to be linting regardless any plugin configuring => disabling the plugin for tim e
     event = {
         "BufReadPre",
         "BufNewFile",

@@ -14,6 +14,12 @@ return {
                         -- vertical = { width = 0.9, height = 0,95 },
                     }
                 },
+                pickers = {
+                    find_files = {
+                        -- `hidden = true` will still show the inside of `.git/` as it's not `.gitignore`d.
+                        find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
+                    },
+                },
                 extensions = { ["ui-select"] = { require("telescope.themes").get_dropdown({}), },
                 },
             })
