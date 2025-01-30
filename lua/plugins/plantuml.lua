@@ -1,11 +1,14 @@
 return
 {
+
+    --- plantuml suntaxt highlighting ---
     {
         -- puml syntax (vim script plugin). https://github.com/aklt/plantuml-syntax
         "aklt/plantuml-syntax",
-        enabled = false,
-        opts = {},
+        ft = { "plantuml", "puml", "pu", "uml", "iuml" },
+        -- enabled = false,
     },
+
     {
         'https://gitlab.com/itaranto/preview.nvim',
         even = "VeryLazy",
@@ -52,7 +55,7 @@ return
         -- branch = "unfreeze",
         ft = "plantuml",
         -- Optional for puml syntax highlighting:
-        dependencies = { 'javiorfo/nvim-nyctophilia', "folke/which-key.nvim" },
+        -- dependencies = { "javiorfo/nvim-nyctophilia", "folke/which-key.nvim" },
         -- lazy = true,
         opts = function()
             -- If you want to use Plant UML jar version instead of the install version
