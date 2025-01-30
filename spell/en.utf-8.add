@@ -20,3 +20,5 @@ github
 tmux
 inotify
 inotifywait
+Alacritty
+toml
