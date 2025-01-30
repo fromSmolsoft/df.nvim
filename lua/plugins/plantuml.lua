@@ -12,10 +12,10 @@ return
 
     --- plantuml previewers ---
     {
-        'https://gitlab.com/itaranto/preview.nvim',
+        "https://gitlab.com/itaranto/preview.nvim",
         even = "VeryLazy",
         ft = { "plantuml", },
-        version = '*',
+        version = "*",
         opts = {
             -- Your options.
             previewers_by_ft = {
@@ -28,10 +28,10 @@ return
                         }
                     },
 
-                    --  FIXME: trows e...
-                    -- plantuml = { name = 'plantuml_text', renderer = { type = 'buffer', opts = { split_cmd = 'split' } }, },
+                    --  FIXME: trows error bc plantuml doesn"t support ascii rendering for all diagram types
+                    -- plantuml = { name = "plantuml_text", renderer = { type = "buffer", opts = { split_cmd = "split" } }, },
 
-                    -- markdown = { name = 'pandoc_wkhtmltopdf', renderer = { type = 'command', opts = { cmd = { 'zathura' } } }, },
+                    -- markdown = { name = "pandoc_wkhtmltopdf", renderer = { type = "command", opts = { cmd = { "zathura" } } }, },
                 },
             },
             previewers = {
@@ -55,9 +55,9 @@ return
         -- end
     },
     {
-        'javiorfo/nvim-soil',
+        "javiorfo/nvim-soil",
         -- my own fork that fixes freezing
-        -- 'fromSmolsoft/nvim-soil',
+        -- "fromSmolsoft/nvim-soil",
         -- branch = "unfreeze",
         ft = "plantuml",
         -- Optional for puml syntax highlighting:
