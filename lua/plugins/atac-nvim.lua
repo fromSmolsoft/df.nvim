@@ -2,7 +2,7 @@ return
 {
     -- REST requests without leaving neovim similar to postman, https://github.com/NachoNievaG/atac.nvim, requires atac >= 0.13.0
     "NachoNievaG/atac.nvim",
-    enabled = false,
+    cond = false,
     dependencies = { "akinsho/toggleterm.nvim" },
     opts = {
         -- TODO: store project specific files in `project_root/.tmp/atac/`
