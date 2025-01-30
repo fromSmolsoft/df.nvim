@@ -9,6 +9,8 @@ return
         -- enabled = false,
     },
 
+
+    --- plantuml previewers ---
     {
         'https://gitlab.com/itaranto/preview.nvim',
         even = "VeryLazy",
@@ -18,8 +20,12 @@ return
             -- Your options.
             previewers_by_ft = {
                 plantuml = {
-                    name = 'plantuml_svg',
-                    renderer = { type = 'command', opts = { cmd = { 'feh' } }
+                    name = "plantuml_svg",
+                    renderer = {
+                        type = "command",
+                        opts = {
+                            cmd = { "feh", "--auto-zoom", "--scale-down", "--borderless" },
+                        }
                     },
 
                     --  FIXME: trows e...
@@ -30,7 +36,7 @@ return
             },
             previewers = {
                 plantuml_svg = {
-                    args = { '-pipe', '-tpng' },
+                    -- args = { "-pipe", "-tpng" },
                 },
             },
             render_on_write = true,
