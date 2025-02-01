@@ -40,7 +40,7 @@ return
 
         local path_to_config = path_to_jdtls .. "/config_" .. os
         local lombok_path = path_to_jdtls .. "/lombok.jar"
-        local path_to_jar = path_to_jdtls .. "/org.eclipse.equinox.launcher_*.jar"
+        local launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")
 
         return {
             cmd = {
