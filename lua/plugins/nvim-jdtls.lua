@@ -1,15 +1,11 @@
 return
 {
-    -- Java (jdtls) custom configuration
+    -- https://github.com/mfussenegger/nvim-jdtls
     'mfussenegger/nvim-jdtls',
-    -- nvim-jdtls:  https://github.com/mfussenegger/nvim-jdtls
-    enabled = true, -- trying out https://github.com/nvim-java/nvim-java instead and can't be used together
-    dependencies = { 'hrsh7th/cmp-nvim-lsp', "mfussenegger/nvim-dap" },
-
-    -- setup options
+    cond = true, -- don't use together with "nvim-java/nvim-java" or "lsp-config"'s jdtls
     opts = function()
         local home = os.getenv("HOME")
-        -- Project root & name:
+        -- Project
         local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }
         local root_dir = vim.fs.dirname(vim.fs.find(root_markers, { upward = true })[1] or vim.fn.getcwd())
         local project_name = vim.fn.fnamemodify(root_dir, ':p:h:t')
@@ -28,7 +24,7 @@ return
         local path_to_jdebug = path_to_mason_packages .. "/java-debug-adapter"
         local path_to_jtest = path_to_mason_packages .. "/java-test"
 
-        -- Current OS:
+        -- Identify operation system
         local os
         if vim.fn.has "macunix" then
             os = "mac"
@@ -169,12 +165,12 @@ return
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "java",
             callback = function()
-                vim.notify("Starting JDTLS...")
+                vim.notify("Starting JDTLS with: `require('jdtls').start_or_attach`", vim.log.levels.INFO)
                 local success, result = pcall(require('jdtls').start_or_attach, opts)
                 if success then
-                    vim.notify("JDTLS started")
+                    vim.notify("JDTLS started", vim.log.levels.INFO)
                 else
-                    vim.notify("Error JDTLS: " .. tostring(result))
+                    vim.notify("JDTLS [ERROR]: " .. tostring(result), vim.log.levels.ERROR)
                 end
             end
         })
