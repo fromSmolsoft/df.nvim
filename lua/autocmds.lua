@@ -29,6 +29,17 @@ api.nvim_create_autocmd('BufRead', {
     end,
 })
 
+-- set folding method for nvim-treesitter supported / unsupported filetypes
+vim.api.nvim_create_autocmd({ "FileType" }, {
+    callback = function()
+        if require("nvim-treesitter.parsers").has_parser() then
+            vim.opt.foldmethod = "expr"
+            vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+        else
+            vim.opt.foldmethod = "syntax"
+        end
+    end,
+})
 -- TODO: autosave on timer,focus loss, if inside `.git` repository
 -- local autoSaveGrp = api.nvim_create_augroup("AutoSaveGrp", { clear = true })
 -- api.nvim_create_autocmd(
