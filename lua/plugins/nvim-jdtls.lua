@@ -1,3 +1,24 @@
+local function print_table(t)
+    local message = ""
+    for _, value in ipairs(t) do
+        message = message .. value .. " "
+    end
+    vim.notify(message, vim.log.levels.INFO)
+end
+
+local function get_os()
+    local os_name = vim.fn.has("macunix") == 1 and "mac" or
+        vim.fn.has("win32") == 1 and "win" or
+        "linux"
+
+    -- Debug information
+    vim.notify(string.format("Detected OS: %s", os_name))
+    -- vim.notify(string.format("macunix: %s", vim.fn.has("macunix") == 1 and "true" or "false"))
+    -- vim.notify(string.format("win32: %s", vim.fn.has("win32") == 1 and "true" or "false"))
+
+    return os_name
+end
+
 return
 {
     -- https://github.com/mfussenegger/nvim-jdtls
@@ -20,18 +41,11 @@ return
         -- Literal mason path definition:
         -- local path_to_mason_packages = home .. "/.local/share/nvim/mason/packages" -- literal path
         -- local path_to_jdtls = path_to_mason_packages .. "/jdtls"
+        local os = get_os()
 
         local path_to_jdebug = path_to_mason_packages .. "/java-debug-adapter"
         local path_to_jtest = path_to_mason_packages .. "/java-test"
 
-        -- Identify operation system
-        local os
-        if vim.fn.has "macunix" then
-            os = "mac"
-        elseif vim.fn.has "win32" then
-            os = "win"
-        else
-            os = "linux"
         end
 
         local path_to_config = path_to_jdtls .. "/config_" .. os
@@ -157,6 +171,15 @@ return
                 },
             },
         }
+
+            -- type :CheckJavaVersion to check java version
+            vim.api.nvim_create_user_command(
+                'CheckJavaVersion',
+                function()
+                    vim.notify(vim.fn.system('/usr/bin/java --version'))
+                end,
+                {}
+            )
     end,
 
     -- setup nvim-jdtls
@@ -166,9 +189,9 @@ return
             pattern = "java",
             callback = function()
                 vim.notify("Starting JDTLS with: `require('jdtls').start_or_attach`", vim.log.levels.INFO)
-                local success, result = pcall(require('jdtls').start_or_attach, opts)
+                local success, result = pcall(require("jdtls").start_or_attach, opts)
                 if success then
-                    vim.notify("JDTLS started", vim.log.levels.INFO)
+                    vim.notify("JDTLS started: " .. tostring(result), vim.log.levels.INFO)
                 else
                     vim.notify("JDTLS [ERROR]: " .. tostring(result), vim.log.levels.ERROR)
                 end
