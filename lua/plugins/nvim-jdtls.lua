@@ -22,7 +22,7 @@ end
 return
 {
     -- https://github.com/mfussenegger/nvim-jdtls
-    'mfussenegger/nvim-jdtls',
+    "mfussenegger/nvim-jdtls",
     cond = true, -- don't use together with "nvim-java/nvim-java" or "lsp-config"'s jdtls
     opts = function()
         local home = os.getenv("HOME")
@@ -31,12 +31,12 @@ return
         local root_dir = vim.fs.dirname(vim.fs.find(root_markers, { upward = true })[1] or vim.fn.getcwd())
         local project_name = vim.fn.fnamemodify(root_dir, ':p:h:t')
 
-        -- Workspace specific cache: Class paths don't work when workspace is inside root_dir!
         local workspace_dir = home .. "/.cache/jdtls/workspace/" .. project_name
+        -- Workspace cache: Class paths don't work when workspace is in project's root_dir!
 
-        -- Dynamically get paths to mason's `.../jdtls` and `.../packages` by going to `/jdtls` parent dir `/..`
         local path_to_jdtls = require("mason-registry").get_package("jdtls"):get_install_path()
         local path_to_mason_packages = vim.fn.resolve(path_to_jdtls .. "/..")
+        -- Mason
 
         -- Literal mason path definition:
         -- local path_to_mason_packages = home .. "/.local/share/nvim/mason/packages" -- literal path
@@ -45,6 +45,9 @@ return
 
         local path_to_jdebug = path_to_mason_packages .. "/java-debug-adapter"
         local path_to_jtest = path_to_mason_packages .. "/java-test"
+        -- Jdtls features
+        -- Capabilities
+        -- java-debug and java-test extensions
 
         end
 
@@ -123,6 +126,7 @@ return
                             "javax",
                             "com",
                             "org",
+                -- Command + flags launching jdtls
                         },
                     },
                     sources = {
@@ -162,7 +166,6 @@ return
                 }
             },
 
-            -- dab (debugging)
             init_options = {
                 bundles = {
                     vim.fn.glob(
