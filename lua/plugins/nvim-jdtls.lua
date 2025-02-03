@@ -39,7 +39,6 @@ return
         -- Workspace cache: Class paths don't work when workspace is in project's root_dir!
         local user_home = os.getenv("HOME")
         local workspace_path = user_home .. "/.cache/jdtls/workspace/" .. project_name
-        -- mkdir_and_notify(workspace_path, "workspace")
 
         -- Mason
         local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
