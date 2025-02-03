@@ -14,6 +14,7 @@ return
             function(server_name)
                 -- skip jdtls setup by mason-lspconfig.nvim
                 if server_name == "jdtls" then
+                    vim.notify("mason-lspconfig: skipping jdtls")
                     --[[ if require("lazy.core.config").plugins["nvim-jdtls"]._.kind == "normal" then
                         vim.notify("nvim-jdtls enabled")
                     else
@@ -27,7 +28,7 @@ return
     },
     {
         "nvim-java/nvim-java", -- https://github.com/nvim-java/nvim-java
-        enabled = false,       -- not to be used alongside nvim-jdtls
+        cond = false ,       -- not to be used alongside nvim-jdtls
         -- FIX: trows error when configuring dap despite dap being diabled
         -- FIX: Gradle project resolve imports can't be resolved etc.
         config = function()
@@ -113,7 +114,7 @@ return
 
             -- list of servers sharing same (default) configuration
             local servers = {
-                --"jdtls", -- don't setup jdtls if nvim-jdtls is used
+                -- "jdtls", -- don't setup jdtls if nvim-jdtls is used
                 "marksman",
                 "pyright", "ruff",
                 "ts_ls", "html", "bashls",
