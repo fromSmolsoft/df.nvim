@@ -1,15 +1,6 @@
-
-local function get_os()
-    local os_name = vim.fn.has("macunix") == 1 and "mac" or
-        vim.fn.has("win32") == 1 and "win" or
-        "linux"
-    return os_name
-end
-
-local function merge_tables(t1, t2)
-    table.move(t2, 1, #t2, #t1 + 1, t1)
-    return t1
-end
+local TAG = "[JDTLS]"
+local tbltostring = require("utils.print_table")
+local vutil = require("utils.vutil")
 
 return
 {
@@ -24,14 +15,14 @@ return
         local project_name = vim.fn.fnamemodify(root_dir, ':p:h:t')
 
         -- Workspace cache: Class paths don't work when workspace is in project's root_dir!
-        local user_home = os.getenv("HOME")
+        local user_home = vutil.get_userhome()
         local workspace_path = user_home .. "/.cache/jdtls/workspace/" .. project_name
 
         -- Mason
         local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
         local jdtls_path = require("mason-registry").get_package("jdtls"):get_install_path()
 
-        local os = get_os()
+        local os = vutil.get_os()
 
         -- Jdtls features
         local path_to_config = jdtls_path .. "/config_" .. os
@@ -166,12 +157,12 @@ return
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "java",
             callback = function()
-                vim.notify("Starting JDTLS with: `require('jdtls').start_or_attach`", vim.log.levels.INFO)
+                vim.notify("[JDTLS]: start_or_attach", vim.log.levels.INFO)
                 local success, result = pcall(require("jdtls").start_or_attach, opts)
                 if success then
-                    vim.notify("JDTLS started: " .. tostring(result), vim.log.levels.INFO)
+                    vim.notify(TAG .. " started: " .. tostring(result), vim.log.levels.INFO)
                 else
-                    vim.notify("JDTLS [ERROR]: " .. tostring(result), vim.log.levels.ERROR)
+                    vim.notify(TAG .. " [ERROR]: " .. tostring(result), vim.log.levels.ERROR)
                 end
             end
         })
