@@ -1,10 +1,3 @@
-local function print_table(t)
-    local message = ""
-    for _, value in ipairs(t) do
-        message = message .. value .. " "
-    end
-    vim.notify(message, vim.log.levels.INFO)
-end
 
 local function get_os()
     local os_name = vim.fn.has("macunix") == 1 and "mac" or
@@ -13,15 +6,9 @@ local function get_os()
     return os_name
 end
 
-local debug_list = { "[DEBUG]\n" }
-
 local function merge_tables(t1, t2)
     table.move(t2, 1, #t2, #t1 + 1, t1)
     return t1
-end
-
-local function add_to_debug_list(t)
-    merge_tables(debug_list, t)
 end
 
 return
@@ -78,15 +65,6 @@ return
             "-configuration", path_to_config,
             "-data", workspace_path,
         }
-
-        -- Debugging
-        add_to_debug_list({
-            "\nDetected OS= ", os,
-            "\nproject_name= ", project_name,
-            "\nroot_dir=", root_dir,
-            "\ncmd={\n" })
-        add_to_debug_list(cmd)
-        add_to_debug_list({ "\n}\n" })
 
         return {
                 cmd = cmd,
@@ -189,7 +167,6 @@ return
             pattern = "java",
             callback = function()
                 vim.notify("Starting JDTLS with: `require('jdtls').start_or_attach`", vim.log.levels.INFO)
-                print_table(debug_list)
                 local success, result = pcall(require("jdtls").start_or_attach, opts)
                 if success then
                     vim.notify("JDTLS started: " .. tostring(result), vim.log.levels.INFO)
