@@ -20,6 +20,22 @@ return {
     --]]
     get_userhome = function()
         return os.getenv("HOME")
-    end
+    end,
 
+
+    --[[
+    Verify whether file exists and can be open for reading.
+    Opens file for reading temporarily.
+    @filename string
+    @returns true if file exists, false if file doesn't exists or can't be open for reading
+    --]]
+    is_file = function(filename)
+        local file = io.open(filename, "r")
+        if file ~= nill then
+            io.close(file)
+            return true
+        else
+            return false
+        end
+    end,
 }
