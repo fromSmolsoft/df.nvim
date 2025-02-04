@@ -1,6 +1,14 @@
+--[[ "toString" like utility ]]
 return {
-    -- dump table to "pretty" string. Not suited for enormous tables (stack-overflow)
-    dump = function(o)
+
+    --[[
+     Dump table to "pretty" string.
+     - useful eg. When debugging config to get literal table values in place of extracted variables.
+     [!] Not suited for enormous tables => stack-overflow
+     @param table to be pretty printed
+     @return string representation of input table
+    --]]
+    dump = function(tbl)
         local seen = {}
         local function dump_recursive(obj, depth)
             depth = depth or 0
@@ -23,12 +31,12 @@ return {
                     end
                     s = s .. "\n" .. indent .. key_formatted .. dump_recursive(v, depth + 1) .. ','
                 end
-                local closing_indent = string.rep(" ", (depth * 2) - 2 )
+                local closing_indent = string.rep(" ", (depth * 2) - 2)
                 return s .. "\n" .. closing_indent .. '}'
             else
                 return tostring(obj)
             end
         end
-        return dump_recursive(o)
+        return dump_recursive(tbl)
     end,
 }
