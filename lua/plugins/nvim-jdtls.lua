@@ -29,6 +29,24 @@ return
         local lombok_path = jdtls_path .. "/lombok.jar"
         local launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")
 
+        --[[
+        INFO: This snippet checks if launcher filename includes _ and version, otherwise filename without _version is used.
+        `org.eclipse.launcher_*.jar` -> `org.eclipse.launcher.jar`
+        [Reason] Mason jdtls package had version stripped from filename.
+        --]]
+        if not vutil.is_file(launcher) then
+            local launcher_dmsg = "\tlauncher = \"" .. launcher .. "\""
+            vim.notify(TAG .. "Path to is invalid.\n " .. launcher_dmsg .. " \n" .. "Trying alternative file name:",
+                vim.log.levels.ERROR)
+            launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher.jar")
+            launcher_dmsg = "launcher= \"" .. launcher .. "\""
+            if not vutil.is_file(launcher) then
+                vim.notify(TAG .. "Path to is invalid. " .. launcher_dmsg, vim.log.levels.ERROR)
+            else
+                vim.notify(TAG .. "success.\n " .. launcher_dmsg)
+            end
+        end
+
         -- Capabilities
         local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
         local extendedClientCapabilities = require("jdtls").extendedClientCapabilities
@@ -135,10 +153,7 @@ return
                     }
                 },
 
-                init_options = {
-                    bundles = bundles,
-                    bundles = {},
-                },
+                init_options = { bundles = bundles, },
             },
 
             -- type :CheckJavaVersion to check java version
@@ -153,6 +168,7 @@ return
 
     -- setup nvim-jdtls
     config = function(_, opts)
+        -- vim.notify(tbltostring.dump(opts))
         -- vim api auto-command to start_or_attach this only for java
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "java",
