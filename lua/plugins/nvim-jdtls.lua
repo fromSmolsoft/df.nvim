@@ -1,4 +1,5 @@
 local TAG = "[JDTLS]"
+local java_cmds = vim.api.nvim_create_augroup('java_cmds', { clear = true })
 local tbltostring = require("utils.print_table")
 local vutil = require("utils.vutil")
 
@@ -169,9 +170,12 @@ return
     -- setup nvim-jdtls
     config = function(_, opts)
         -- vim.notify(tbltostring.dump(opts))
-        -- vim api auto-command to start_or_attach this only for java
+
+        -- vim auto-command calls start_or_attach this only for java
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "java",
+            group = java_cmds,
+            desc = "start_or_attach",
             callback = function()
                 vim.notify("[JDTLS]: start_or_attach", vim.log.levels.INFO)
                 local success, result = pcall(require("jdtls").start_or_attach, opts)
