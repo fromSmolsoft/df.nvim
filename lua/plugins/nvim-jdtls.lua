@@ -82,13 +82,13 @@ return
                 root_dir = root_dir,
                 settings = {
                     java = {
-                        debug = {
-                            enableDebugRequests = true,
-                            jvmArgs = {
-                                "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:1044"
-                            },
-                            -- vim.lsp.set_log_level("TRACE"),
-                        },
+                        -- debug = {
+                        --     enableDebugRequests = true,
+                        --     jvmArgs = {
+                        --         "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:1044"
+                        --     },
+                        --     vim.lsp.set_log_level("TRACE"),
+                        -- },
                         references = { includeDecompiledSources = true, },
                         format = {
                             enabled = true,
@@ -138,7 +138,7 @@ return
                                 {
                                     name = "Java23-arch",
                                     path = "/usr/lib/jvm/java-23-openjdk/bin/",
-                                    default = true
+                                    -- default = true
                                 },
                                 {
                                     name = "Java21-arch",
