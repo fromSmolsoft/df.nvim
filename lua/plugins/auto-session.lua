@@ -2,7 +2,10 @@ return {
     -- https://github.com/rmagatti/auto-session?tab=readme-ov-file#%EF%B8%8F-configuration
     "rmagatti/auto-session",
     lazy = false,
-    -- dependencies = { 'nvim-telescope/telescope.nvim', },
+    dependencies = {
+        -- 'nvim-telescope/telescope.nvim',
+        "folke/which-key.nvim", -- FIXME:removing this dependency breaks which-key plugin
+    },
     keys = {
         { '<leader>sl', '<cmd>SessionSearch<CR>',         desc = 'Session search' },
         { '<leader>ss', '<cmd>SessionSave<CR>',           desc = 'Save session' },
