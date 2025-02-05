@@ -105,7 +105,7 @@ return
                         contentProvider = { preferred = "fernflower" },
                         sources = {
                             organizeImports = {
-                                -- when to group imports `*`
+                                -- when to group imports to `*`
                                 starThreshold = 9999,
                                 staticStarThreshold = 9999,
                             },
@@ -121,8 +121,7 @@ return
                                 "org.mockito.Mockito.*",
                             },
                             filteredTypes = {
-                                "com.sun.*", "io.micrometer.shaded.*",
-                                "java.awt.*", "jdk.*", "sun.*",
+                                "com.sun.*", "io.micrometer.shaded.*", "java.awt.*", "jdk.*", "sun.*",
                             },
                             importOrder = { "java", "javax", "com", "org", },
                         },
@@ -169,13 +168,14 @@ return
 
     -- setup nvim-jdtls
     config = function(_, opts)
+        -- [DEBUG] dump all of the opts to console
         -- vim.notify(tbltostring.dump(opts))
 
         -- vim auto-command calls start_or_attach this only for java
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "java",
             group = java_cmds,
-            desc = "start_or_attach",
+            desc = TAG .. " start_or_attach",
             callback = function()
                 vim.notify("[JDTLS]: start_or_attach", vim.log.levels.INFO)
                 local success, result = pcall(require("jdtls").start_or_attach, opts)
