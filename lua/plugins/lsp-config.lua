@@ -1,3 +1,4 @@
+Lsp_augrp = vim.api.nvim_create_augroup("lsp_augrp", { clear = false })
 return
 {
     {
@@ -62,6 +63,7 @@ return
             capabilities.textDocument.completion.completionItem.snippetSupport = true
             local lspconfig = require("lspconfig")
             vim.api.nvim_create_autocmd("LspAttach", {
+                group = Lsp_augrp,
                 desc = "Lsp Actions",
                 callback = function(event)
                     -- keymaps
