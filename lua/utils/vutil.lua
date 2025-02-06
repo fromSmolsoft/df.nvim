@@ -32,7 +32,7 @@ return {
     ]]
     is_file = function(filename)
         local file = io.open(filename, "r")
-        if file ~= nill then
+        if file ~= nil then
             io.close(file)
             return true
         else
