@@ -2,12 +2,12 @@
 return {
 
     --[[
-     Dump table to "pretty" string.
-     - useful eg. When debugging config to get literal table values in place of extracted variables.
-     [!] Not suited for enormous tables => stack-overflow
-     @param table to be pretty printed
-     @return string representation of input table
-    --]]
+    Dump table to "pretty" string.
+    - useful eg. When debugging config to get literal table values in place of extracted variables.
+    [!] Not suited for enormous tables => stack-overflow
+    @param table to be pretty printed
+    @return string representation of input table
+    ]]
     dump = function(tbl)
         local seen = {}
         local function dump_recursive(obj, depth)
