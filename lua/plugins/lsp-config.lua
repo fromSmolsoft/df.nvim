@@ -8,7 +8,7 @@ return
         "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
         opts = {
             ensure_installed = { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
-            auto_install = true,
+            automatic_installation = true,
 
             -- use alongside `nvim-jdtls` plugin
             function(server_name)
