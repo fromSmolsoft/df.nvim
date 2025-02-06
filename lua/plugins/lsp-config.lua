@@ -15,20 +15,14 @@ return
                 -- skip jdtls setup by mason-lspconfig.nvim
                 if server_name == "jdtls" then
                     vim.notify("mason-lspconfig: skipping jdtls")
-                    --[[ if require("lazy.core.config").plugins["nvim-jdtls"]._.kind == "normal" then
-                        vim.notify("nvim-jdtls enabled")
-                    else
-                        vim.notify("nvim-jdtls disabled")
-                    end --]]
                     return true
                 end
             end
         },
-        -- config = function(_, opts) require("mason-lspconfig").setup(opts) end
     },
     {
         "nvim-java/nvim-java", -- https://github.com/nvim-java/nvim-java
-        cond = false ,       -- not to be used alongside nvim-jdtls
+        cond = false,          -- not to be used alongside nvim-jdtls
         -- FIX: trows error when configuring dap despite dap being diabled
         -- FIX: Gradle project resolve imports can't be resolved etc.
         config = function()
@@ -38,9 +32,9 @@ return
         end
     },
     {
-        --- Allows switching between custom lsp configurations per project or globally by loading json
+        ---  switching custom lsp configurations per project or globally by loading json
         "folke/neoconf.nvim", -- https://github.com/folke/neoconf.nvim
-        enabled = false,
+        cond = false,
         opts = {
             --   - global settings: ~/.config/nvim/neoconf.json
             --   - local settings: ~/projects/foobar/.neoconf.json
@@ -53,7 +47,9 @@ return
     },
     {
         "neovim/nvim-lspconfig", -- https://github.com/neovim/nvim-lspconfig
-        dependencies = { "folke/neoconf.nvim", "nvim-java/nvim-java", },
+        -- dependencies = { "folke/neoconf.nvim", "nvim-java/nvim-java", },
+
+        -- config fun. used by lazy-nvim to setup plugins
         config = function()
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             capabilities.textDocument.completion.completionItem.snippetSupport = true
