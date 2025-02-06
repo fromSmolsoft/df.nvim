@@ -7,7 +7,10 @@ return
     {
         "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
         opts = {
-            ensure_installed = { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
+
+            -- Automatically installed servers.
+            ensure_installed = { "lua_ls", "jdtls", },
+            -- ensure_installed = { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
 
             -- Automatically install servers that are set up (via lspconfig)
             -- Either: `false`, `true` or `{ exclude: string[] }` All ls set up via lspconfig, except the list {...}
