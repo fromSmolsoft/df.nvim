@@ -1,4 +1,51 @@
+-- Local variables
 Lsp_augrp = vim.api.nvim_create_augroup("lsp_augrp", { clear = false })
+local mason_registry = require("mason-registry")
+
+
+-- Mason package item.
+---@param name string name of mason package eg. `"lua_ls"`
+---@param ...table Optional package configuration
+---@return table package_and_config `{name, configuration}`
+local function create_pckg(name, ...)
+    local config = ...
+    return { name = name, configuration = config or {} }
+end
+
+
+-- Verify whether package is in mason-registry and is installed at the same time.
+---@param name string name of the mason package
+---@return boolean
+local function is_mason_package(name)
+    return (mason_registry.has_package(name) and not mason_registry.is_installed(name))
+end
+
+
+-- Get Mason packages that are not installed.
+---@param pckgs_names table list of package names
+---@return table missing_packages as list of strings
+local function get_missing_packages(pckgs_names)
+    if pckgs_names == nil then return {} end
+    local missing_pckgs = {}
+    if type(pckgs_names) == "string" then
+        if is_mason_package(pckgs_names) then missing_pckgs[#missing_pckgs + 1] = pckgs_names end
+        return missing_pckgs
+    end
+    for _, value in pairs(pckgs_names) do
+        if is_mason_package(value) then missing_pckgs[#missing_pckgs + 1] = value end
+    end
+    return missing_pckgs
+end
+
+-- Install list of mason packages by command `:MasonInstall package1 package2 ... <CR>`
+---@param packages table list of packages names strings
+local function install_mason_packages(packages)
+    if #packages > 0 then
+        vim.cmd { cmd = "MasonInstall", args = packages }
+    end
+end
+
+-- plugins
 return
 {
     {
@@ -9,8 +56,7 @@ return
         "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
         opts = {
             -- Automatically installed servers. eg. { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
-
-            ensure_installed = { "lua_ls", "jdtls", },
+            ensure_installed = { "lua_ls", },
 
             -- (not reliable) Automatically install servers that are set up (via lspconfig)
             automatic_installation = true,
@@ -95,56 +141,75 @@ return
                 end
             })
 
-            -- list of servers sharing same (default) configuration
-            local servers = {
-                -- "jdtls", -- don't setup jdtls if nvim-jdtls is used
-                "marksman",
-                "pyright", "ruff",
-                "ts_ls", "html", "bashls",
-                "taplo", "powershell_es",
-                "gradle_ls",
-                "lemminx",
+            -- common default configuration for language server
+            local ls_default_conf = {
+                capabilities = capabilities,
+                init_options = {
+                    -- Most likely not needed anymore due to capabilities' config
+                    usePlaceholders = true,
+                },
             }
 
-            for _, lsp in pairs(servers) do
-                lspconfig[lsp].setup {
+            -- all ls mason names and their configurations
+            local lsps = {
+                create_pckg("jdtls"),
+                create_pckg("marksman", ls_default_conf),
+                create_pckg("pyright", ls_default_conf),
+                create_pckg("ruff", ls_default_conf),
+                create_pckg("ts_ls", ls_default_conf),
+                create_pckg("html", ls_default_conf),
+                create_pckg("bashls", ls_default_conf),
+                create_pckg("taplo", ls_default_conf),
+                create_pckg("powershell_es", ls_default_conf),
+                create_pckg("gradle_ls", ls_default_conf),
+                create_pckg("lemminx", ls_default_conf),
+                create_pckg("lua_ls", {
                     capabilities = capabilities,
-                    init_options = {
-                        -- Most likely not needed anymore due to capabilities' config
-                        usePlaceholders = true,
+                    settings = {
+                        Lua = {
+                            init_options = {
+                                -- Most likely not needed anymore due to capabilities' config
+                                usePlaceholders = true,
+                            },
+                            diagnostics = { globals = { "vim", "describe", "it", "before_each", "after_each" }, },
+                            workspace = {
+                                -- Make the server aware of Neovim runtime files
+                                library = vim.api.nvim_get_runtime_file("", true),
+                            },
+                            telemetry = { enable = false, },
+                        },
                     },
-                }
+                }),
+                create_pckg("sqls", {
+                    on_attach = function(client, _)
+                        capabilities = capabilities
+                        client.server_capabilities.documentFormattingProvider = false
+                        client.server_capabilities.documentRangeFormattingProvider = false
+                    end,
+                }),
+            }
+
+            local get_package_names = function(ls_list)
+                local package_names = {}
+                for _, value in pairs(ls_list) do
+                    local name = value.name
+                    package_names[#package_names + 1] = name
+                end
+                return package_names
             end
 
-            -- sqls custom config (requires db connection)
-            -- lspconfig.sqls.setup({
-            --     on_attach = function(client, _)
-            --         capabilities = capabilities
-            --         client.server_capabilities.documentFormattingProvider = false
-            --         client.server_capabilities.documentRangeFormattingProvider = false
-            --     end,
-            -- })
+            -- batch call setup_ls()
+            ---@param ls_list table list of mason_packages eg. `packages = { item1 = {name = "name", config = {}}, item2..., item3.., .... }`
+            local setup_ls_in_batch = function(ls_list)
+                for _, value in pairs(ls_list) do
+                    local name, conf = value.name, value.configuration
+                    if conf == true or next(conf) ~= nil then lspconfig[name].setup(conf) end
+                end
+            end
 
-            -- lua_ls custom config
-            lspconfig.lua_ls.setup({
-                capabilities = capabilities,
-                settings = {
-                    Lua = {
-                        init_options = {
-                            -- Most likely not needed anymore due to capabilities' config
-                            usePlaceholders = true,
-                        },
-                        diagnostics = { globals = { "vim", "describe", "it", "before_each", "after_each" }, },
-                        workspace = {
-                            -- Make the server aware of Neovim runtime files
-                            library = vim.api.nvim_get_runtime_file("", true),
-                        },
-
-                        -- By default, lua-language-server sends anonymized data to its developers. Stop it using the following.
-                        telemetry = { enable = false, },
-                    },
-                },
-            })
+            local package_names = get_package_names(lsps)
+            install_mason_packages(get_missing_packages(package_names))
+            setup_ls_in_batch(lsps)
         end,
     },
     {
@@ -197,21 +262,9 @@ return
                 "printenv", -- not in mason_registry
             }
 
-            local mason_registry = require("mason-registry")
             local missing_mason_packages, missing_mason_packages_msg = {}, "Missing packages: "
 
-            --- in given list find Mason packages that were not yet installed
-            --- @param tools to ensure being installed
-            local function get_missing_packages(tools)
-                for _, value in pairs(tools) do
-                    if (mason_registry.has_package(value) and not mason_registry.is_installed(value)) then
-                        missing_mason_packages[#missing_mason_packages + 1] = value
-                        missing_mason_packages_msg = missing_mason_packages_msg .. value .. ", "
-                    end
-                end
-            end
-
-            get_missing_packages(builtins_to_mason)
+            install_mason_packages(get_missing_packages(builtins_to_mason))
 
             --- Install mason given packages command `MasonInstall `
             ---@param table packages list of packages to be installed
