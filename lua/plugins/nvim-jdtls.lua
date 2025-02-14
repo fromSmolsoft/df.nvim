@@ -1,6 +1,6 @@
 local TAG = "[JDTLS]"
 local java_cmds = vim.api.nvim_create_augroup('java_cmds', { clear = true })
-local tbltostring = require("utils.print_table")
+local tbl = require("utils.print_table")
 local vutil = require("utils.vutil")
 
 return
@@ -160,9 +160,7 @@ return
             -- type :CheckJavaVersion to check java version
             vim.api.nvim_create_user_command(
                 'CheckJavaVersion',
-                function()
-                    vim.notify(vim.fn.system('/usr/bin/java --version'))
-                end,
+                function() vim.notify(vim.fn.system('/usr/bin/java --version')) end,
                 {}
             )
     end,
@@ -170,7 +168,7 @@ return
     -- setup nvim-jdtls
     config = function(_, opts)
         -- [DEBUG] dump all of the opts to console
-        -- vim.notify(tbltostring.dump(opts))
+        vim.notify(TAG .. "\n" .. tbl.dump(opts))
 
         -- vim auto-command calls start_or_attach this only for java
         vim.api.nvim_create_autocmd("FileType", {
