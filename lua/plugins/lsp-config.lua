@@ -1,3 +1,10 @@
+-- Debug
+local dump = require("utils.print_table").dump
+local TAG = "[lsp-config]"
+local SHORT_SRC = debug.getinfo(2, "S").short_src
+local function log(message, level) vim.notify(TAG .. ' ' .. message, level) end
+
+
 -- Local variables
 Lsp_augrp = vim.api.nvim_create_augroup("lsp_augrp", { clear = false })
 local mason_registry = require("mason-registry")
