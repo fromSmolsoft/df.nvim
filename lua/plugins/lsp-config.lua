@@ -8,14 +8,11 @@ return
     {
         "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
         opts = {
+            -- Automatically installed servers. eg. { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
 
-            -- Automatically installed servers.
             ensure_installed = { "lua_ls", "jdtls", },
-            -- ensure_installed = { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
 
-            -- Automatically install servers that are set up (via lspconfig)
-            -- Either: `false`, `true` or `{ exclude: string[] }` All ls set up via lspconfig, except the list {...}
-            -- Example: automatic_installation = { exclude = { "rust_analyzer", "solargraph" } }
+            -- (not reliable) Automatically install servers that are set up (via lspconfig)
             automatic_installation = true,
 
             -- use alongside `nvim-jdtls` plugin
@@ -29,33 +26,14 @@ return
         },
     },
     {
-        "nvim-java/nvim-java", -- https://github.com/nvim-java/nvim-java
-        cond = false,          -- not to be used alongside nvim-jdtls
-        -- FIX: trows error when configuring dap despite dap being diabled
-        -- FIX: Gradle project resolve imports can't be resolved etc.
-        config = function()
-            require('java').setup({
-                java_debug_adapter = { enable = false, },
-            })
-        end
-    },
-    {
-        ---  switching custom lsp configurations per project or globally by loading json
-        "folke/neoconf.nvim", -- https://github.com/folke/neoconf.nvim
+        -- https://github.com/folke/neoconf.nvim, switching custom lsp configurations per project or globally by loading json
+        "folke/neoconf.nvim",
         cond = false,
-        opts = {
-            --   - global settings: ~/.config/nvim/neoconf.json
-            --   - local settings: ~/projects/foobar/.neoconf.json
-        },
-        -- config = function()
-        --     require("neoconf").setup({
-        --         -- override any of the default settings here
-        --     })
-        -- end
+        opts = {},
     },
     {
         "neovim/nvim-lspconfig", -- https://github.com/neovim/nvim-lspconfig
-        -- dependencies = { "folke/neoconf.nvim", "nvim-java/nvim-java", },
+        -- dependencies = { "folke/neoconf.nvim", },
 
         -- config fun. used by lazy-nvim to setup plugins
         config = function()
@@ -236,7 +214,7 @@ return
             get_missing_packages(builtins_to_mason)
 
             --- Install mason given packages command `MasonInstall `
-            --- @param packages list of packages to be installed
+            ---@param table packages list of packages to be installed
             local function install_mason_packages(packages)
                 if #packages > 0 then
                     vim.notify(missing_mason_packages_msg)
