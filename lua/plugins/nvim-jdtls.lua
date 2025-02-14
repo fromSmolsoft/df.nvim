@@ -8,6 +8,7 @@ return
     -- FIXME: jdtls exits with code 13
     -- https://github.com/mfussenegger/nvim-jdtls
     "mfussenegger/nvim-jdtls",
+    dependencies = { "williamboman/mason.nvim" --[[ need for mason data]], },
     cond = true, -- don't use together with "nvim-java/nvim-java" or "lsp-config"'s jdtls
     opts = function()
         -- Project
