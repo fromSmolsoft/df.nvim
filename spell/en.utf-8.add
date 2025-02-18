@@ -23,3 +23,5 @@ inotifywait
 Alacritty
 toml
 autoinstall
+MasonInstall
+param
