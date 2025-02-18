@@ -2,6 +2,17 @@ local TAG = "[JDTLS]"
 local java_cmds = vim.api.nvim_create_augroup('java_cmds', { clear = true })
 local tbl = require("utils.print_table")
 local vutil = require("utils.vutil")
+local mason_registry = require("mason-registry")
+local mason_core_package = require("mason-core.package")
+
+---Install mason package if not already installed
+---@param package_name string name of the mason package same as in `:MasonInstall package`
+local function install_or_skip(package_name)
+    if (mason_registry.is_installed(package_name)) then return end
+    mason_registry.refresh()
+    -- mason_core_package.install(package_name) -- TODO: use API for installing packages
+    vim.cmd { cmd = "MasonInstall", args = { package_name } }
+end
 
 return
 {
@@ -22,6 +33,7 @@ return
         -- Mason
         local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
         local jdtls_path = require("mason-registry").get_package("jdtls"):get_install_path()
+        install_or_skip("jdtls")
 
         -- local operation system
         local os = vutil.get_os()
@@ -52,6 +64,8 @@ return
         extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 
         -- java-debug and java-test extensions
+        install_or_skip("java-debug-adapter")
+        install_or_skip("java-test")
         local bundles = vim.split(vim.fn.glob(mason_path .. "packages/java-*/extension/server/*.jar", 1),
             '\n')
         -- Filter out unwanted bundles
