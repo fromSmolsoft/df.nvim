@@ -1,17 +1,9 @@
--- Debug
-local dump = require("utils.print_table").dump
-local TAG = "[lsp-config]"
-local SHORT_SRC = debug.getinfo(2, "S").short_src
-local notify = vim.notify
-local function log(message, level) notify(TAG .. ' ' .. message, level) end
-
-
 -- Local variables
-Lsp_augrp = vim.api.nvim_create_augroup("lsp_augrp", { clear = false })
+local notify = vim.notify
+local Lsp_augrp = vim.api.nvim_create_augroup("lsp_augrp", { clear = false })
 local mason_registry = require("mason-registry")
 
-
--- Mason package item.
+---Mason package item.
 ---@param name string name of mason package eg. `"lua_ls"`
 ---@param ...table Optional package configuration
 ---@return table package_and_config `{name, configuration}`
@@ -20,16 +12,14 @@ local function create_pckg(name, ...)
     return { name = name, configuration = config or {} }
 end
 
-
--- Verify whether package is in mason-registry and is installed at the same time.
+---Verify whether package is in mason-registry and is installed at the same time.
 ---@param name string name of the mason package
 ---@return boolean
 local function is_mason_package(name)
     return (mason_registry.has_package(name) and not mason_registry.is_installed(name))
 end
 
-
--- Get Mason packages that are not installed.
+---Get Mason packages that are not installed.
 ---@param pckgs_names table list of package names
 ---@return table missing_packages as list of strings
 local function get_missing_packages(pckgs_names)
@@ -45,7 +35,7 @@ local function get_missing_packages(pckgs_names)
     return missing_pckgs
 end
 
--- Install list of mason packages by command `:MasonInstall package1 package2 ... <CR>`
+---Install list of mason packages by command `:MasonInstall package1 package2 ... <CR>`
 ---@param packages table list of packages names strings
 local function install_mason_packages(packages)
     if #packages > 0 then
@@ -66,7 +56,7 @@ return
             -- Automatically installed servers. eg. { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
             ensure_installed = { "lua_ls", },
 
-            -- (not reliable) Automatically install servers that are set up (via lspconfig)
+            -- (not reliable)Supposed to auto-install servers after they are set up
             automatic_installation = true,
 
             -- use alongside `nvim-jdtls` plugin
@@ -129,10 +119,10 @@ return
                             source = "if_many"
                         },
                     })
-                    -- floating window diagnostics
+                    -- diagnostics - floating window
                     vim.o.updatetime = 250
                     vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
-                    -- toggling diagnostics
+                    -- diagnostics - toggling
                     local function togle_diagnostics()
                         if diagnostic.is_enabled() then
                             diagnostic.enable(false)
@@ -151,7 +141,7 @@ return
                 end
             })
 
-            -- common default configuration for language server
+            -- common default configuration for language servers
             local ls_default_conf = {
                 capabilities = capabilities,
                 init_options = {
@@ -208,7 +198,7 @@ return
                 return package_names
             end
 
-            -- batch call setup_ls()
+            ---batch call setup_ls()
             ---@param ls_list table list of mason_packages eg. `packages = { item1 = {name = "name", config = {}}, item2..., item3.., .... }`
             local setup_ls_in_batch = function(ls_list)
                 for _, value in pairs(ls_list) do
@@ -235,7 +225,6 @@ return
         dependencies = { "nvim-lua/plenary.nvim", lazy = true },
         config = function()
             local null_ls = require("null-ls")
-
 
             local sql_ft = { "sql", }
             local sqlfluff_args = { "--dialect", "postgres" }
