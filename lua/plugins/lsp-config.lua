@@ -2,7 +2,8 @@
 local dump = require("utils.print_table").dump
 local TAG = "[lsp-config]"
 local SHORT_SRC = debug.getinfo(2, "S").short_src
-local function log(message, level) vim.notify(TAG .. ' ' .. message, level) end
+local notify = vim.notify
+local function log(message, level) notify(TAG .. ' ' .. message, level) end
 
 
 -- Local variables
@@ -72,7 +73,7 @@ return
             function(server_name)
                 -- skip jdtls autonomous setup by mason-lspconfig.nvim
                 if server_name == "jdtls" then
-                    vim.notify("mason-lspconfig: skipping jdtls")
+                    notify("mason-lspconfig: skipping jdtls")
                     return true
                 end
             end
@@ -109,15 +110,17 @@ return
                         end
                     end
                     whichkey_groups()
-                    vim.keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
-                    vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
-                    vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
-                    vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
-                    vim.keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
-                    vim.keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
-                    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+                    local keymap = vim.keymap
+                    keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
+                    keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
+                    keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
+                    keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
+                    keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
+                    keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
+                    keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
                     -- configure lsp in-line diagnostics
-                    vim.diagnostic.config({
+                    local diagnostic = vim.diagnostic
+                    diagnostic.config({
                         severity_sort = true,
                         virtual_text = false,
                         signs = true,
@@ -131,17 +134,17 @@ return
                     vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
                     -- toggling diagnostics
                     local function togle_diagnostics()
-                        if vim.diagnostic.is_enabled() then
-                            vim.diagnostic.enable(false)
-                            vim.diagnostic.reset()
-                            vim.notify("𐄂 Diagnostics disabled") --print to status bar
+                        if diagnostic.is_enabled() then
+                            diagnostic.enable(false)
+                            diagnostic.reset()
+                            notify("𐄂 Diagnostics disabled") --print to status bar
                         else
-                            vim.diagnostic.enable(true)
-                            vim.notify("✅ Diagnostics enabled")
+                            diagnostic.enable(true)
+                            notify("✅ Diagnostics enabled")
                         end
                     end
 
-                    vim.keymap.set('n', '<leader>td', togle_diagnostics, { desc = "disgnostic toogle" })
+                    keymap.set('n', '<leader>td', togle_diagnostics, { desc = "disgnostic toogle" })
 
                     -- TODO: reference highlighting
                     -- vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.lsp.buf.document_highlight(nil, {focus=false, scope="cursor"})]]
@@ -159,7 +162,7 @@ return
 
             -- all ls mason names and their configurations
             local lsps = {
-                create_pckg("jdtls",{}),
+                create_pckg("jdtls", {}),
                 create_pckg("marksman", ls_default_conf),
                 create_pckg("pyright", ls_default_conf),
                 create_pckg("ruff", ls_default_conf),
@@ -269,20 +272,7 @@ return
                 "printenv", -- not in mason_registry
             }
 
-            local missing_mason_packages, missing_mason_packages_msg = {}, "Missing packages: "
-
             install_mason_packages(get_missing_packages(builtins_to_mason))
-
-            --- Install mason given packages command `MasonInstall `
-            ---@param table packages list of packages to be installed
-            local function install_mason_packages(packages)
-                if #packages > 0 then
-                    vim.notify(missing_mason_packages_msg)
-                    vim.cmd { cmd = "MasonInstall", args = packages }
-                end
-            end
-
-            install_mason_packages(missing_mason_packages)
 
             null_ls.setup({
                 sources = {
