@@ -70,7 +70,7 @@ return
 
             -- use alongside `nvim-jdtls` plugin
             function(server_name)
-                -- skip jdtls setup by mason-lspconfig.nvim
+                -- skip jdtls autonomous setup by mason-lspconfig.nvim
                 if server_name == "jdtls" then
                     vim.notify("mason-lspconfig: skipping jdtls")
                     return true
@@ -159,7 +159,7 @@ return
 
             -- all ls mason names and their configurations
             local lsps = {
-                create_pckg("jdtls"),
+                create_pckg("jdtls",{}),
                 create_pckg("marksman", ls_default_conf),
                 create_pckg("pyright", ls_default_conf),
                 create_pckg("ruff", ls_default_conf),
