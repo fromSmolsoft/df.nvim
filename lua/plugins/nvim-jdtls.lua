@@ -5,7 +5,6 @@ local vutil = require("utils.vutil")
 
 return
 {
-    -- FIXME: jdtls exits with code 13
     -- https://github.com/mfussenegger/nvim-jdtls
     "mfussenegger/nvim-jdtls",
     dependencies = { "williamboman/mason.nvim" --[[ need for mason data]], },
@@ -24,6 +23,7 @@ return
         local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
         local jdtls_path = require("mason-registry").get_package("jdtls"):get_install_path()
 
+        -- local operation system
         local os = vutil.get_os()
 
         -- Jdtls features
@@ -31,11 +31,7 @@ return
         local lombok_path = jdtls_path .. "/lombok.jar"
         local launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")
 
-        --[[
-        INFO: This snippet checks if launcher filename includes _ and version, otherwise filename without _version is used.
-        `org.eclipse.launcher_*.jar` -> `org.eclipse.launcher.jar`
-        [Reason] Mason jdtls package had version stripped from filename.
-        --]]
+        --  checks if launcher filename includes _ and version, otherwise filename without _version is used. `org.eclipse.launcher_*.jar` -> `org.eclipse.launcher.jar` [Reason] Mason jdtls package had version stripped from filename.
         if not vutil.is_file(launcher) then
             local launcher_dmsg = "\tlauncher = \"" .. launcher .. "\""
             vim.notify(TAG .. "Path to is invalid.\n " .. launcher_dmsg .. " \n" .. "Trying alternative file name:",
@@ -70,6 +66,7 @@ return
         end
         bundles = vim.tbl_filter(function(bundle) return bundle ~= "" and not should_ignore_bunlde(bundle) end, bundles)
 
+        -- Command to start jdtls
         local cmd = {
             vim.fn.expand "$HOME/.local/share/nvim/mason/bin/jdtls",
             -- "java",
@@ -94,13 +91,6 @@ return
                 root_dir = root_dir,
                 settings = {
                     java = {
-                        -- debug = {
-                        --     enableDebugRequests = true,
-                        --     jvmArgs = {
-                        --         "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:1044"
-                        --     },
-                        --     vim.lsp.set_log_level("TRACE"),
-                        -- },
                         references = { includeDecompiledSources = true, },
                         format = {
                             enabled = true,
@@ -179,7 +169,7 @@ return
     -- setup nvim-jdtls
     config = function(_, opts)
         -- [DEBUG] dump all of the opts to console
-        vim.notify(TAG .. "\n" .. tbl.dump(opts))
+        -- vim.notify(TAG .. "\n" .. tbl.dump(opts))
 
         -- vim auto-command calls start_or_attach this only for java
         vim.api.nvim_create_autocmd("FileType", {
