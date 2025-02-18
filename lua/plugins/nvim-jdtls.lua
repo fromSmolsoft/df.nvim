@@ -32,8 +32,11 @@ return
 
         -- Mason
         local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
-        local jdtls_path = require("mason-registry").get_package("jdtls"):get_install_path()
         install_or_skip("jdtls")
+        local jdtls_path = mason_registry.get_package("jdtls"):get_install_path()
+
+        -- path to java 21+ / jdtls executable
+        local java = jdtls_path .. "/jdtls"
 
         -- local operation system
         local os = vutil.get_os()
@@ -82,8 +85,7 @@ return
 
         -- Command to start jdtls
         local cmd = {
-            vim.fn.expand "$HOME/.local/share/nvim/mason/bin/jdtls",
-            -- "java",
+            java,
             "-Declipse.application=org.eclipse.jdt.ls.core.id1",
             "-Dosgi.bundles.defaultStartLevel=4",
             "-Declipse.product=org.eclipse.jdt.ls.core.product",
