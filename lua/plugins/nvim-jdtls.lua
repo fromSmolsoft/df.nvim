@@ -56,8 +56,19 @@ return
         extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 
         -- java-debug and java-test extensions
-        local bundles = { vim.split(
-            vim.fn.glob(mason_path .. "packages/java-*/extension/server/*.jar", 1), '\n'), }
+        local bundles = vim.split(vim.fn.glob(mason_path .. "packages/java-*/extension/server/*.jar", 1),
+            '\n')
+        -- Filter out unwanted bundles
+        local ignored_bunldes = { "com.microsoft.java.test.runner-jar-with-dependencies.jar", "jacocoagent.jar" }
+        local find = string.find
+        local function should_ignore_bunlde(bundle)
+            for _, ignored in ipairs(ignored_bunldes) do
+                if find(bundle, ignored, 1, true) then
+                    return true
+                end
+            end
+        end
+        bundles = vim.tbl_filter(function(bundle) return bundle ~= "" and not should_ignore_bunlde(bundle) end, bundles)
 
         local cmd = {
             vim.fn.expand "$HOME/.local/share/nvim/mason/bin/jdtls",
