@@ -296,7 +296,7 @@ return
                     -- null_diagnostics.shellcheck,      -- deprecated,  bash
 
                     --code_actions
-                    null_actions.gitsigns, -- gitsisgns
+                    -- null_actions.gitsigns, -- gitsisgns
 
                     --hover
                     null_hover.printenv, -- sh, dosbatch, ps1
