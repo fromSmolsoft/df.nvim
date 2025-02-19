@@ -263,39 +263,43 @@ return
 
             install_mason_packages(get_missing_packages(builtins_to_mason))
 
+            local null_formatter = null_ls.builtins.formatting
+            local null_diagnostics = null_ls.builtins.diagnostics
+            local null_actions = null_ls.builtins.code_actions
+            local null_hover = null_ls.builtins.hover
+
             null_ls.setup({
                 sources = {
-
                     -- formatting --
-                    null_ls.builtins.formatting.prettier.with({ filetypes = prettier_ft }),
-                    null_ls.builtins.formatting.cbfmt.with({ filetypes = markdown }), -- format code blocks in markdown``
-                    null_ls.builtins.formatting.npm_groovy_lint.with({ filetypes = groovy }),
+                    null_formatter.prettier.with({ filetypes = prettier_ft }),
+                    null_formatter.cbfmt.with({ filetypes = markdown }), -- format code blocks in markdown``
+                    null_formatter.npm_groovy_lint.with({ filetypes = groovy }),
 
-                    null_ls.builtins.formatting.shellharden.with({ filetypes = sh_ft }),
-                    null_ls.builtins.formatting.shfmt.with({ filetypes = sh_ft }),
+                    null_formatter.shellharden.with({ filetypes = sh_ft }),
+                    null_formatter.shfmt.with({ filetypes = sh_ft }),
 
-                    null_ls.builtins.formatting.sqlfluff.with({
+                    null_formatter.sqlfluff.with({
                         filetypes = sql_ft,
                         extra_args = sqlfluff_args, -- change to your dialect
                     }),
 
                     -- diagnostics --
-                    null_ls.builtins.diagnostics.npm_groovy_lint.with({
+                    null_diagnostics.npm_groovy_lint.with({
                         filetypes = groovy,
                         disabled_filetypes = { "java" }, -- filetypes has to specifically not include java or it lints Java in weird way
                     }),
-                    null_ls.builtins.diagnostics.sqlfluff.with({
+                    null_diagnostics.sqlfluff.with({
                         filetypes = sql_ft,
                         extra_args = sqlfluff_args, -- change to your dialect
                     }),
 
-                    -- null_ls.builtins.diagnostics.shellcheck,      -- deprecated,  bash
+                    -- null_diagnostics.shellcheck,      -- deprecated,  bash
 
                     --code_actions
-                    null_ls.builtins.code_actions.gitsigns, -- gitsisgns
+                    null_actions.gitsigns, -- gitsisgns
 
                     --hover
-                    null_ls.builtins.hover.printenv, -- sh, dosbatch, ps1
+                    null_hover.printenv, -- sh, dosbatch, ps1
                 },
             })
         end,
