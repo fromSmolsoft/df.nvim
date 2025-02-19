@@ -14,12 +14,12 @@ local function install_or_skip(package_name)
     vim.cmd { cmd = "MasonInstall", args = { package_name } }
 end
 
-return
-{
+return {
     -- https://github.com/mfussenegger/nvim-jdtls
     "mfussenegger/nvim-jdtls",
     dependencies = { "williamboman/mason.nvim" --[[ need for mason data]], },
     cond = true, -- don't use together with "nvim-java/nvim-java" or "lsp-config"'s jdtls
+    ---@return table jdtls_configuration
     opts = function()
         -- Project
         local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }
@@ -32,7 +32,7 @@ return
 
         -- Mason
         local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
-        install_or_skip("jdtls")
+        install_or_skip("jdtls") -- INFO:Mason has bug -> prevents installing versions eg. `jdtls@1.43.0`
         local jdtls_path = mason_registry.get_package("jdtls"):get_install_path()
 
         -- path to java 21+ / jdtls executable
@@ -46,7 +46,7 @@ return
         local lombok_path = jdtls_path .. "/lombok.jar"
         local launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")
 
-        --  checks if launcher filename includes _ and version, otherwise filename without _version is used. `org.eclipse.launcher_*.jar` -> `org.eclipse.launcher.jar` [Reason] Mason jdtls package had version stripped from filename.
+        --  if launcher filename doesn't include a version try `org.eclipse.launcher_*.jar` -> `org.eclipse.launcher.jar`. (Mason may ship jdtls without a version).
         if not vutil.is_file(launcher) then
             local launcher_dmsg = "\tlauncher = \"" .. launcher .. "\""
             vim.notify(TAG .. "Path to is invalid.\n " .. launcher_dmsg .. " \n" .. "Trying alternative file name:",
