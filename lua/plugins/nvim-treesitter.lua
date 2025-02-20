@@ -3,17 +3,26 @@ return {
         "nvim-treesitter/nvim-treesitter",
         build = ":TSUpdate",
         opts = {
-            ensure_installed = {
-                "lua",
-                "java", "groovy", "sql", "properties", -- Java
-                "html", "xml",
-                "vim", "vimdoc",
-                "bash", "typescript", "javascript", "python",
-                "markdown",
-                "gitignore", "gitcommit", "tmux",
-                "ini", "yaml", "toml"
-            },
             auto_install = true,
+            ensure_installed = {
+                -- not installed by auto_install
+                "regex", "markdown_inline", "comment", "luadoc",
+
+                -- scripting
+                "lua", "bash", "python", "vim",
+
+                -- java projects
+                -- "java", "groovy", "sql", "properties",
+
+                -- web
+                -- "html", "xml", "typescript", "javascript",
+
+                -- docs
+                -- "vimdoc", "markdown", "gitignore", "gitcommit",
+
+                -- configurations
+                -- "tmux", "ini", "yaml", "toml",
+            },
             highlight = { enable = true },
             indent = { enable = true },
             function()

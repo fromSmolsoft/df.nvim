@@ -1,3 +1,49 @@
+-- Local variables
+local notify = vim.notify
+local Lsp_augrp = vim.api.nvim_create_augroup("lsp_augrp", { clear = false })
+local mason_registry = require("mason-registry")
+
+---Mason package item.
+---@param name string name of mason package eg. `"lua_ls"`
+---@param ...table Optional package configuration
+---@return table package_and_config `{name, configuration}`
+local function create_pckg(name, ...)
+    local config = ...
+    return { name = name, configuration = config or {} }
+end
+
+---Verify whether package is in mason-registry and is installed at the same time.
+---@param name string name of the mason package
+---@return boolean
+local function is_mason_package(name)
+    return (mason_registry.has_package(name) and not mason_registry.is_installed(name))
+end
+
+---Get Mason packages that are not installed.
+---@param pckgs_names table list of package names
+---@return table missing_packages as list of strings
+local function get_missing_packages(pckgs_names)
+    if pckgs_names == nil then return {} end
+    local missing_pckgs = {}
+    if type(pckgs_names) == "string" then
+        if is_mason_package(pckgs_names) then missing_pckgs[#missing_pckgs + 1] = pckgs_names end
+        return missing_pckgs
+    end
+    for _, value in pairs(pckgs_names) do
+        if is_mason_package(value) then missing_pckgs[#missing_pckgs + 1] = value end
+    end
+    return missing_pckgs
+end
+
+---Install list of mason packages by command `:MasonInstall package1 package2 ... <CR>`
+---@param packages table list of packages names strings
+local function install_mason_packages(packages)
+    if #packages > 0 then
+        vim.cmd { cmd = "MasonInstall", args = packages }
+    end
+end
+
+-- plugins
 return
 {
     {
@@ -7,57 +53,39 @@ return
     {
         "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
         opts = {
-            ensure_installed = { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
-            auto_install = true,
+            -- Automatically installed servers. eg. { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
+            ensure_installed = { "lua_ls", },
+
+            -- (not reliable)Supposed to auto-install servers after they are set up
+            automatic_installation = true,
 
             -- use alongside `nvim-jdtls` plugin
             function(server_name)
-                -- skip jdtls setup by mason-lspconfig.nvim
+                -- skip jdtls autonomous setup by mason-lspconfig.nvim
                 if server_name == "jdtls" then
-                    --[[ if require("lazy.core.config").plugins["nvim-jdtls"]._.kind == "normal" then
-                        vim.notify("nvim-jdtls enabled")
-                    else
-                        vim.notify("nvim-jdtls disabled")
-                    end --]]
+                    notify("mason-lspconfig: skipping jdtls")
                     return true
                 end
             end
         },
-        -- config = function(_, opts) require("mason-lspconfig").setup(opts) end
     },
     {
-        "nvim-java/nvim-java", -- https://github.com/nvim-java/nvim-java
-        enabled = false,       -- not to be used alongside nvim-jdtls
-        -- FIX: trows error when configuring dap despite dap being diabled
-        -- FIX: Gradle project resolve imports can't be resolved etc.
-        config = function()
-            require('java').setup({
-                java_debug_adapter = { enable = false, },
-            })
-        end
-    },
-    {
-        --- Allows switching between custom lsp configurations per project or globally by loading json
-        "folke/neoconf.nvim", -- https://github.com/folke/neoconf.nvim
-        enabled = false,
-        opts = {
-            --   - global settings: ~/.config/nvim/neoconf.json
-            --   - local settings: ~/projects/foobar/.neoconf.json
-        },
-        -- config = function()
-        --     require("neoconf").setup({
-        --         -- override any of the default settings here
-        --     })
-        -- end
+        -- https://github.com/folke/neoconf.nvim, switching custom lsp configurations per project or globally by loading json
+        "folke/neoconf.nvim",
+        cond = false,
+        opts = {},
     },
     {
         "neovim/nvim-lspconfig", -- https://github.com/neovim/nvim-lspconfig
-        dependencies = { "folke/neoconf.nvim", "nvim-java/nvim-java", },
+        -- dependencies = { "folke/neoconf.nvim", },
+
+        -- config fun. used by lazy-nvim to setup plugins
         config = function()
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             capabilities.textDocument.completion.completionItem.snippetSupport = true
             local lspconfig = require("lspconfig")
             vim.api.nvim_create_autocmd("LspAttach", {
+                group = Lsp_augrp,
                 desc = "Lsp Actions",
                 callback = function(event)
                     -- keymaps
@@ -72,15 +100,17 @@ return
                         end
                     end
                     whichkey_groups()
-                    vim.keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
-                    vim.keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
-                    vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
-                    vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
-                    vim.keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
-                    vim.keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
-                    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+                    local keymap = vim.keymap
+                    keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
+                    keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
+                    keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
+                    keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
+                    keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
+                    keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
+                    keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
                     -- configure lsp in-line diagnostics
-                    vim.diagnostic.config({
+                    local diagnostic = vim.diagnostic
+                    diagnostic.config({
                         severity_sort = true,
                         virtual_text = false,
                         signs = true,
@@ -89,78 +119,97 @@ return
                             source = "if_many"
                         },
                     })
-                    -- floating window diagnostics
+                    -- diagnostics - floating window
                     vim.o.updatetime = 250
                     vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
-                    -- toggling diagnostics
+                    -- diagnostics - toggling
                     local function togle_diagnostics()
-                        if vim.diagnostic.is_enabled() then
-                            vim.diagnostic.enable(false)
-                            vim.diagnostic.reset()
-                            vim.notify("𐄂 Diagnostics disabled") --print to status bar
+                        if diagnostic.is_enabled() then
+                            diagnostic.enable(false)
+                            diagnostic.reset()
+                            notify("𐄂 Diagnostics disabled") --print to status bar
                         else
-                            vim.diagnostic.enable(true)
-                            vim.notify("✅ Diagnostics enabled")
+                            diagnostic.enable(true)
+                            notify("✅ Diagnostics enabled")
                         end
                     end
 
-                    vim.keymap.set('n', '<leader>td', togle_diagnostics, { desc = "disgnostic toogle" })
+                    keymap.set('n', '<leader>td', togle_diagnostics, { desc = "disgnostic toogle" })
 
                     -- TODO: reference highlighting
                     -- vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.lsp.buf.document_highlight(nil, {focus=false, scope="cursor"})]]
                 end
             })
 
-            -- list of servers sharing same (default) configuration
-            local servers = {
-                --"jdtls", -- don't setup jdtls if nvim-jdtls is used
-                "marksman",
-                "pyright", "ruff",
-                "ts_ls", "html", "bashls",
-                "taplo", "powershell_es",
-                "gradle_ls",
-                "lemminx",
+            -- common default configuration for language servers
+            local ls_default_conf = {
+                capabilities = capabilities,
+                init_options = {
+                    -- Most likely not needed anymore due to capabilities' config
+                    usePlaceholders = true,
+                },
             }
 
-            for _, lsp in pairs(servers) do
-                lspconfig[lsp].setup {
+            -- all ls mason names and their configurations
+            local lsps = {
+                create_pckg("jdtls", {}),
+                create_pckg("marksman", ls_default_conf),
+                create_pckg("pyright", ls_default_conf),
+                create_pckg("ruff", ls_default_conf),
+                create_pckg("ts_ls", ls_default_conf),
+                create_pckg("html", ls_default_conf),
+                create_pckg("bashls", ls_default_conf),
+                create_pckg("taplo", ls_default_conf),
+                create_pckg("powershell_es", ls_default_conf),
+                create_pckg("gradle_ls", ls_default_conf),
+                create_pckg("lemminx", ls_default_conf),
+                create_pckg("lua_ls", {
                     capabilities = capabilities,
-                    init_options = {
-                        -- Most likely not needed anymore due to capabilities' config
-                        usePlaceholders = true,
+                    settings = {
+                        Lua = {
+                            init_options = {
+                                -- Most likely not needed anymore due to capabilities' config
+                                usePlaceholders = true,
+                            },
+                            diagnostics = { globals = { "vim", "describe", "it", "before_each", "after_each" }, },
+                            workspace = {
+                                -- Make the server aware of Neovim runtime files
+                                library = vim.api.nvim_get_runtime_file("", true),
+                            },
+                            telemetry = { enable = false, },
+                        },
                     },
-                }
+                }),
+                create_pckg("sqls", {
+                    on_attach = function(client, _)
+                        capabilities = capabilities
+                        client.server_capabilities.documentFormattingProvider = false
+                        client.server_capabilities.documentRangeFormattingProvider = false
+                    end,
+                }),
+            }
+
+            local get_package_names = function(ls_list)
+                local package_names = {}
+                for _, value in pairs(ls_list) do
+                    local name = value.name
+                    package_names[#package_names + 1] = name
+                end
+                return package_names
             end
 
-            -- sqls custom config (requires db connection)
-            -- lspconfig.sqls.setup({
-            --     on_attach = function(client, _)
-            --         capabilities = capabilities
-            --         client.server_capabilities.documentFormattingProvider = false
-            --         client.server_capabilities.documentRangeFormattingProvider = false
-            --     end,
-            -- })
+            ---batch call setup_ls()
+            ---@param ls_list table list of mason_packages eg. `packages = { item1 = {name = "name", config = {}}, item2..., item3.., .... }`
+            local setup_ls_in_batch = function(ls_list)
+                for _, value in pairs(ls_list) do
+                    local name, conf = value.name, value.configuration
+                    if conf == true or next(conf) ~= nil then lspconfig[name].setup(conf) end
+                end
+            end
 
-            -- lua_ls custom config
-            lspconfig.lua_ls.setup({
-                capabilities = capabilities,
-                settings = {
-                    Lua = {
-                        init_options = {
-                            -- Most likely not needed anymore due to capabilities' config
-                            usePlaceholders = true,
-                        },
-                        diagnostics = { globals = { "vim", "describe", "it", "before_each", "after_each" }, },
-                        workspace = {
-                            -- Make the server aware of Neovim runtime files
-                            library = vim.api.nvim_get_runtime_file("", true),
-                        },
-
-                        -- By default, lua-language-server sends anonymized data to its developers. Stop it using the following.
-                        telemetry = { enable = false, },
-                    },
-                },
-            })
+            local package_names = get_package_names(lsps)
+            install_mason_packages(get_missing_packages(package_names))
+            setup_ls_in_batch(lsps)
         end,
     },
     {
@@ -176,7 +225,6 @@ return
         dependencies = { "nvim-lua/plenary.nvim", lazy = true },
         config = function()
             local null_ls = require("null-ls")
-
 
             local sql_ft = { "sql", }
             local sqlfluff_args = { "--dialect", "postgres" }
@@ -213,66 +261,45 @@ return
                 "printenv", -- not in mason_registry
             }
 
-            local mason_registry = require("mason-registry")
-            local missing_mason_packages, missing_mason_packages_msg = {}, "Missing packages: "
+            install_mason_packages(get_missing_packages(builtins_to_mason))
 
-            --- in given list find Mason packages that were not yet installed
-            --- @param tools to ensure being installed
-            local function get_missing_packages(tools)
-                for _, value in pairs(tools) do
-                    if (mason_registry.has_package(value) and not mason_registry.is_installed(value)) then
-                        missing_mason_packages[#missing_mason_packages + 1] = value
-                        missing_mason_packages_msg = missing_mason_packages_msg .. value .. ", "
-                    end
-                end
-            end
-
-            get_missing_packages(builtins_to_mason)
-
-            --- Install mason given packages command `MasonInstall `
-            --- @param packages list of packages to be installed
-            local function install_mason_packages(packages)
-                if #packages > 0 then
-                    vim.notify(missing_mason_packages_msg)
-                    vim.cmd { cmd = "MasonInstall", args = packages }
-                end
-            end
-
-            install_mason_packages(missing_mason_packages)
+            local null_formatter = null_ls.builtins.formatting
+            local null_diagnostics = null_ls.builtins.diagnostics
+            local null_actions = null_ls.builtins.code_actions
+            local null_hover = null_ls.builtins.hover
 
             null_ls.setup({
                 sources = {
-
                     -- formatting --
-                    null_ls.builtins.formatting.prettier.with({ filetypes = prettier_ft }),
-                    null_ls.builtins.formatting.cbfmt.with({ filetypes = markdown }), -- format code blocks in markdown``
-                    null_ls.builtins.formatting.npm_groovy_lint.with({ filetypes = groovy }),
+                    null_formatter.prettier.with({ filetypes = prettier_ft }),
+                    null_formatter.cbfmt.with({ filetypes = markdown }), -- format code blocks in markdown``
+                    null_formatter.npm_groovy_lint.with({ filetypes = groovy }),
 
-                    null_ls.builtins.formatting.shellharden.with({ filetypes = sh_ft }),
-                    null_ls.builtins.formatting.shfmt.with({ filetypes = sh_ft }),
+                    null_formatter.shellharden.with({ filetypes = sh_ft }),
+                    null_formatter.shfmt.with({ filetypes = sh_ft }),
 
-                    null_ls.builtins.formatting.sqlfluff.with({
+                    null_formatter.sqlfluff.with({
                         filetypes = sql_ft,
                         extra_args = sqlfluff_args, -- change to your dialect
                     }),
 
                     -- diagnostics --
-                    null_ls.builtins.diagnostics.npm_groovy_lint.with({
+                    null_diagnostics.npm_groovy_lint.with({
                         filetypes = groovy,
                         disabled_filetypes = { "java" }, -- filetypes has to specifically not include java or it lints Java in weird way
                     }),
-                    null_ls.builtins.diagnostics.sqlfluff.with({
+                    null_diagnostics.sqlfluff.with({
                         filetypes = sql_ft,
                         extra_args = sqlfluff_args, -- change to your dialect
                     }),
 
-                    -- null_ls.builtins.diagnostics.shellcheck,      -- deprecated,  bash
+                    -- null_diagnostics.shellcheck,      -- deprecated,  bash
 
                     --code_actions
-                    null_ls.builtins.code_actions.gitsigns, -- gitsisgns
+                    -- null_actions.gitsigns, -- gitsisgns
 
                     --hover
-                    null_ls.builtins.hover.printenv, -- sh, dosbatch, ps1
+                    null_hover.printenv, -- sh, dosbatch, ps1
                 },
             })
         end,

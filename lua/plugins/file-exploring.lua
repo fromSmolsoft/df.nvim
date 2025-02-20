@@ -1,6 +1,7 @@
 return
 {
     {
+        --https://github.com/nvim-neo-tree/neo-tree.nvim
         "nvim-neo-tree/neo-tree.nvim",
         event = "VeryLazy",
         branch = "v3.x",
@@ -46,7 +47,8 @@ return
 
     {
 
-        'stevearc/oil.nvim',
+        --https://github.com/stevearc/oil.nvim
+        "stevearc/oil.nvim",
         ---@module 'oil'
         ---@type oil.SetupOpts
         opts = {

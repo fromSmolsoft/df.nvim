@@ -1,180 +1,204 @@
-return
-{
-    -- Java (jdtls) custom configuration
-    'mfussenegger/nvim-jdtls',
-    -- nvim-jdtls:  https://github.com/mfussenegger/nvim-jdtls
-    enabled = true, -- trying out https://github.com/nvim-java/nvim-java instead and can't be used together
-    dependencies = { 'hrsh7th/cmp-nvim-lsp', "mfussenegger/nvim-dap" },
+local TAG = "[JDTLS]"
+local java_cmds = vim.api.nvim_create_augroup('java_cmds', { clear = true })
+local tbl = require("utils.print_table")
+local vutil = require("utils.vutil")
+local mason_registry = require("mason-registry")
+local mason_core_package = require("mason-core.package")
 
-    -- setup options
+---Install mason package if not already installed
+---@param package_name string name of the mason package same as in `:MasonInstall package`
+local function install_or_skip(package_name)
+    if (mason_registry.is_installed(package_name)) then return end
+    mason_registry.refresh()
+    -- mason_core_package.install(package_name) -- TODO: use API for installing packages
+    vim.cmd { cmd = "MasonInstall", args = { package_name } }
+end
+
+return {
+    -- https://github.com/mfussenegger/nvim-jdtls
+    "mfussenegger/nvim-jdtls",
+    dependencies = { "williamboman/mason.nvim" --[[ need for mason data]], },
+    cond = true, -- don't use together with "nvim-java/nvim-java" or "lsp-config"'s jdtls
+    ---@return table jdtls_configuration
     opts = function()
-        local home = os.getenv("HOME")
-        -- Project root & name:
+        -- Project
         local root_markers = { ".git", "mvnw", "gradlew", "pom.xml", "build.gradle" }
         local root_dir = vim.fs.dirname(vim.fs.find(root_markers, { upward = true })[1] or vim.fn.getcwd())
         local project_name = vim.fn.fnamemodify(root_dir, ':p:h:t')
 
-        -- Workspace specific cache: Class paths don't work when workspace is inside root_dir!
-        local workspace_dir = home .. "/.cache/jdtls/workspace/" .. project_name
+        -- Workspace cache: Class paths don't work when workspace is in project's root_dir!
+        local user_home = vutil.get_userhome()
+        local workspace_path = user_home .. "/.cache/jdtls/workspace/" .. project_name
 
-        -- Dynamically get paths to mason's `.../jdtls` and `.../packages` by going to `/jdtls` parent dir `/..`
-        local path_to_jdtls = require("mason-registry").get_package("jdtls"):get_install_path()
-        local path_to_mason_packages = vim.fn.resolve(path_to_jdtls .. "/..")
+        -- Mason
+        local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
+        install_or_skip("jdtls") -- INFO:Mason has bug -> prevents installing versions eg. `jdtls@1.43.0`
+        local jdtls_path = mason_registry.get_package("jdtls"):get_install_path()
 
-        -- Literal mason path definition:
-        -- local path_to_mason_packages = home .. "/.local/share/nvim/mason/packages" -- literal path
-        -- local path_to_jdtls = path_to_mason_packages .. "/jdtls"
+        -- path to java 21+ / jdtls executable
+        local java = jdtls_path .. "/jdtls"
 
-        local path_to_jdebug = path_to_mason_packages .. "/java-debug-adapter"
-        local path_to_jtest = path_to_mason_packages .. "/java-test"
+        -- local operation system
+        local os = vutil.get_os()
 
-        -- Current OS:
-        local os
-        if vim.fn.has "macunix" then
-            os = "mac"
-        elseif vim.fn.has "win32" then
-            os = "win"
-        else
-            os = "linux"
+        -- Jdtls features
+        local path_to_config = jdtls_path .. "/config_" .. os
+        local lombok_path = jdtls_path .. "/lombok.jar"
+        local launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")
+
+        --  if launcher filename doesn't include a version try `org.eclipse.launcher_*.jar` -> `org.eclipse.launcher.jar`. (Mason may ship jdtls without a version).
+        if not vutil.is_file(launcher) then
+            local launcher_dmsg = "\tlauncher = \"" .. launcher .. "\""
+            vim.notify(TAG .. "Path to is invalid.\n " .. launcher_dmsg .. " \n" .. "Trying alternative file name:",
+                vim.log.levels.ERROR)
+            launcher = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher.jar")
+            launcher_dmsg = "launcher= \"" .. launcher .. "\""
+            if not vutil.is_file(launcher) then
+                vim.notify(TAG .. "Path to is invalid. " .. launcher_dmsg, vim.log.levels.ERROR)
+            else
+                vim.notify(TAG .. "success.\n " .. launcher_dmsg)
+            end
         end
 
-        local path_to_config = path_to_jdtls .. "/config_" .. os
-        local lombok_path = path_to_jdtls .. "/lombok.jar"
-        local path_to_jar = path_to_jdtls .. "/org.eclipse.equinox.launcher_*.jar"
+        -- Capabilities
+        local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+        local extendedClientCapabilities = require("jdtls").extendedClientCapabilities
+        extendedClientCapabilities.onCompletionItemSelectedCommand = "editor.action.triggerParameterHints"
+        extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
+
+        -- java-debug and java-test extensions
+        install_or_skip("java-debug-adapter")
+        install_or_skip("java-test")
+        local bundles = vim.split(vim.fn.glob(mason_path .. "packages/java-*/extension/server/*.jar", 1),
+            '\n')
+        -- Filter out unwanted bundles
+        local ignored_bundles = { "com.microsoft.java.test.runner-jar-with-dependencies.jar", "jacocoagent.jar" }
+        local find = string.find
+        local function should_ignore_bundle(bundle)
+            for _, ignored in ipairs(ignored_bundles) do
+                if find(bundle, ignored, 1, true) then
+                    return true
+                end
+            end
+        end
+        bundles = vim.tbl_filter(function(bundle) return bundle ~= "" and not should_ignore_bundle(bundle) end, bundles)
+
+        -- Command to start jdtls
+        local cmd = {
+            java,
+            "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+            "-Dosgi.bundles.defaultStartLevel=4",
+            "-Declipse.product=org.eclipse.jdt.ls.core.product",
+            "-Dlog.protocol=true",
+            "-Dlog.level=ALL",
+            "-Xmx1G",
+            "--add-modules=ALL-SYSTEM",
+            "--add-opens", "java.base/java.util=ALL-UNNAMED",
+            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+            "--jvm-arg=-javaagent:" .. lombok_path,
+            "-jar", launcher,
+            "-configuration", path_to_config,
+            "-data", workspace_path,
+        }
 
         return {
-            cmd = {
-                vim.fn.expand '$HOME/.local/share/nvim/mason/bin/jdtls',
-                '-Declipse.application=org.eclipse.jdt.ls.core.id1',
-                '-Dosgi.bundles.defaultStartLevel=4',
-                '-Declipse.product=org.eclipse.jdt.ls.core.product',
-                '-Dlog.protocol=true',
-                '-Dlog.level=ALL',
-                '-Xmx1g',
-                '--add-modules=ALL-SYSTEM',
-                '--add-opens', 'java.base/java.util=ALL-UNNAMED',
-                '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
-                "--jvm-arg=-javaagent:" .. lombok_path,
-                "-jar", path_to_jar,
-                '-configuration', path_to_config,
-                '-data', workspace_dir,
-            },
-
-            capabilities = require 'cmp_nvim_lsp'.default_capabilities(),
-            bundles = vim.split(vim.fn.glob('$HOME/.local/share/nvim/mason/packages/java-*/extension/server/*.jar', 1),
-                '\n'),
-            root_dir = root_dir,
-            settings = {
-                java = {
-                    references = {
-                        includeDecompiledSources = true,
-                    },
-                    format = {
-                        enabled = true,
-                        settings = {
-                            url = vim.fn.stdpath("config") .. "/lang_servers/intellij-java-google-style.xml",
-                            profile = "GoogleStyle",
-                        },
-                    },
-                    eclipse = {
-                        downloadSources = true,
-                    },
-                    maven = {
-                        downloadSources = true,
-                    },
-                    signatureHelp = { enabled = true },
-                    contentProvider = { preferred = "fernflower" },
-
-                    sources = {
-                        organizeImports = {
-                            starThreshold = 9999,
-                            staticStarThreshold = 9999,
-                        },
-                    },
-                    completion = {
-                        favoriteStaticMembers = {
-                            "org.hamcrest.MatcherAssert.assertThat",
-                            "org.hamcrest.Matchers.*",
-                            "org.hamcrest.CoreMatchers.*",
-                            "org.junit.jupiter.api.Assertions.*",
-                            "java.util.Objects.requireNonNull",
-                            "java.util.Objects.requireNonNullElse",
-                            "org.mockito.Mockito.*",
-                        },
-                        filteredTypes = {
-                            "com.sun.*",
-                            "io.micrometer.shaded.*",
-                            "java.awt.*",
-                            "jdk.*",
-                            "sun.*",
-                        },
-                        importOrder = {
-                            "java",
-                            "javax",
-                            "com",
-                            "org",
-                        },
-                    },
-                    sources = {
-                        organizeImports = {
-                            starThreshold = 9999,
-                            staticStarThreshold = 9999,
-                        },
-                    },
-                    codeGeneration = {
-                        toString = {
-                            template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
-                            -- flags = {
-                            -- 	allow_incremental_sync = true,
-                            -- },
-                        },
-                        useBlocks = true,
-                    },
-                    configuration = {
-                        runtimes = {
-                            -- Arch Linux official openJDKs paths:
-                            --    Requires: to install JDK manually
-                            --    eg.: `pacman -S extra/jdk17-openjdk extra/jdk21-openjdk extra/jdk23-openjdk`
-                            {
-                                name = "Java21-arch",
-                                path = "/usr/lib/jvm/java-21-openjdk/bin/",
+                cmd = cmd,
+                capabilities = lsp_capabilities,
+                root_dir = root_dir,
+                settings = {
+                    java = {
+                        references = { includeDecompiledSources = true, },
+                        format = {
+                            enabled = true,
+                            settings = {
+                                url = vim.fn.stdpath("config") .. "/lang_servers/intellij-java-google-style.xml",
+                                profile = "GoogleStyle",
                             },
-                            {
-                                name = "Java23-arch",
-                                path = "/usr/lib/jvm/java-23-openjdk/bin/",
+                        },
+                        eclipse = { downloadSources = true, },
+                        maven = { downloadSources = true, },
+                        extendedClientCapabilities = extendedClientCapabilities,
+                        inlineHints = { pameterNames = { enabled = "all" } },
+                        signatureHelp = { enabled = true },
+                        contentProvider = { preferred = "fernflower" },
+                        sources = {
+                            organizeImports = {
+                                -- when to group imports to `*`
+                                starThreshold = 9999,
+                                staticStarThreshold = 9999,
                             },
-                            {
-                                name = "Java17-arch",
-                                path = "/usr/lib/jvm/java-17-openjdk/bin/",
+                        },
+                        completion = {
+                            favoriteStaticMembers = {
+                                "org.hamcrest.MatcherAssert.assertThat",
+                                "org.hamcrest.Matchers.*",
+                                "org.hamcrest.CoreMatchers.*",
+                                "org.junit.jupiter.api.Assertions.*",
+                                "java.util.Objects.requireNonNull",
+                                "java.util.Objects.requireNonNullElse",
+                                "org.mockito.Mockito.*",
                             },
-                        }
-                    },
-                }
-            },
-
-            -- dab (debugging)
-            init_options = {
-                bundles = {
-                    vim.fn.glob(
-                        "/home/martin/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
-                        1)
+                            filteredTypes = {
+                                "com.sun.*", "io.micrometer.shaded.*", "java.awt.*", "jdk.*", "sun.*",
+                            },
+                            importOrder = { "java", "javax", "com", "org", },
+                        },
+                        codeGeneration = {
+                            toString = {
+                                template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+                                -- flags = { allow_incremental_sync = true, },
+                            },
+                            useBlocks = true,
+                        },
+                        configuration = {
+                            runtimes = {
+                                -- Arch Linux official openJDKs specific paths.
+                                {
+                                    name = "Java23-arch",
+                                    path = "/usr/lib/jvm/java-23-openjdk/bin/",
+                                    -- default = true
+                                },
+                                {
+                                    name = "Java21-arch",
+                                    path = "/usr/lib/jvm/java-21-openjdk/bin/",
+                                },
+                                {
+                                    name = "Java17-arch",
+                                    path = "/usr/lib/jvm/java-17-openjdk/bin/",
+                                },
+                            }
+                        },
+                    }
                 },
+
+                init_options = { bundles = bundles, },
             },
-        }
+
+            -- type :CheckJavaVersion to check java version
+            vim.api.nvim_create_user_command(
+                'CheckJavaVersion',
+                function() vim.notify(vim.fn.system('/usr/bin/java --version')) end,
+                {}
+            )
     end,
 
     -- setup nvim-jdtls
     config = function(_, opts)
-        -- vim api auto-command to start_or_attach this only for java
+        -- [DEBUG] dump all of the opts to console
+        -- vim.notify(TAG .. "\n" .. tbl.dump(opts))
+
+        -- vim auto-command calls start_or_attach this only for java
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "java",
+            group = java_cmds,
+            desc = TAG .. " start_or_attach",
             callback = function()
-                vim.notify("Starting JDTLS...")
-                local success, result = pcall(require('jdtls').start_or_attach, opts)
+                vim.notify("[JDTLS]: start_or_attach", vim.log.levels.INFO)
+                local success, result = pcall(require("jdtls").start_or_attach, opts)
                 if success then
-                    vim.notify("JDTLS started")
+                    vim.notify(TAG .. " started: " .. tostring(result), vim.log.levels.INFO)
                 else
-                    vim.notify("Error JDTLS: " .. tostring(result))
+                    vim.notify(TAG .. " [ERROR]: " .. tostring(result), vim.log.levels.ERROR)
                 end
             end
         })
