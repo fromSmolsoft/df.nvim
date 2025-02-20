@@ -228,6 +228,7 @@ return
 
             local sql_ft = { "sql", }
             local sqlfluff_args = { "--dialect", "postgres" }
+
             local groovy = { "groovy", "Jenkinsfile" }
             local markdown = { "markdown", "org" }
             local prettier_ft = {
@@ -238,6 +239,7 @@ return
                 "svelte", "vue", "astro"
             }
             local sh_ft = { "sh", }
+            local gitcommit = { "gitcommit", }
 
             -- key is none_ls builtins', value is package name in mason_registry. Packages can be duplicated.
             local builtins_to_mason = {
