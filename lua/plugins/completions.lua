@@ -113,6 +113,11 @@ return {
                     }),
             })
 
+            --markdown
+            cmp.setup.filetype({ "markdown" }, {
+                { name = 'render-markdown' },
+            })
+
             -- tmux
             cmp.setup.filetype({ "tmux" }, {
                 sources = cmp.config.sources({
