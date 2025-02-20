@@ -253,6 +253,7 @@ return
                 -- diagnostics
                 npm_groovy_lint = "npm-groovy-lint",
                 sqlfluff = "sqlfluff",
+                gitlint = "gitlint",
 
                 -- code_actions
                 "gitsigns", -- not in mason_registry
@@ -288,6 +289,7 @@ return
                         filetypes = groovy,
                         disabled_filetypes = { "java" }, -- filetypes has to specifically not include java or it lints Java in weird way
                     }),
+                    null_diagnostics.gitlint,
                     null_diagnostics.sqlfluff.with({
                         filetypes = sql_ft,
                         extra_args = sqlfluff_args, -- change to your dialect
