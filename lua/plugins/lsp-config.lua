@@ -1,6 +1,8 @@
--- Local variables
+-- Localization of globals
+local vim = vim
+local vim_api = vim.api
 local notify = vim.notify
-local Lsp_augrp = vim.api.nvim_create_augroup("lsp_augrp", { clear = false })
+local Lsp_augrp = vim_api.nvim_create_augroup("lsp_augrp", { clear = false })
 local mason_registry = require("mason-registry")
 
 ---Mason package item.
@@ -72,7 +74,7 @@ return
     {
         -- https://github.com/folke/neoconf.nvim, switching custom lsp configurations per project or globally by loading json
         "folke/neoconf.nvim",
-        cond = false,
+        enabled = false,
         opts = {},
     },
     {
@@ -84,7 +86,7 @@ return
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             capabilities.textDocument.completion.completionItem.snippetSupport = true
             local lspconfig = require("lspconfig")
-            vim.api.nvim_create_autocmd("LspAttach", {
+            vim_api.nvim_create_autocmd("LspAttach", {
                 group = Lsp_augrp,
                 desc = "Lsp Actions",
                 callback = function(event)
@@ -120,8 +122,12 @@ return
                         },
                     })
                     -- diagnostics - floating window
-                    vim.o.updatetime = 250
-                    vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
+                    vim.o.updatetime = 300
+                    vim_api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+                        group = Lsp_augrp,
+                        pattern = "*",
+                        callback = function() diagnostic.open_float(nil, { focus = false, scope = "cursor" }) end,
+                    })
                     -- diagnostics - toggling
                     local function togle_diagnostics()
                         if diagnostic.is_enabled() then
@@ -174,7 +180,7 @@ return
                             diagnostics = { globals = { "vim", "describe", "it", "before_each", "after_each" }, },
                             workspace = {
                                 -- Make the server aware of Neovim runtime files
-                                library = vim.api.nvim_get_runtime_file("", true),
+                                library = vim_api.nvim_get_runtime_file("", true),
                             },
                             telemetry = { enable = false, },
                         },
