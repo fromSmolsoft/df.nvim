@@ -18,8 +18,8 @@ return {
             -- groovy = { "npm-groovy-lint" }, --not working, has be run under none-ls
             bash = { "shellcheck" },
         }
-
-        local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+        local vim = vim
+        local lint_augroup = vim.api.nvim_create_augroup("lint_augr", { clear = true })
 
         vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
             group = lint_augroup,

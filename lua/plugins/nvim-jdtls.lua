@@ -1,5 +1,8 @@
 local TAG = "[JDTLS]"
-local java_cmds = vim.api.nvim_create_augroup('java_cmds', { clear = true })
+
+---"imports"
+local vim = vim
+local java_augr = vim.api.nvim_create_augroup('java_augr', { clear = true })
 local tbl = require("utils.print_table")
 local vutil = require("utils.vutil")
 local mason_registry = require("mason-registry")
@@ -190,7 +193,7 @@ return {
         -- vim auto-command calls start_or_attach this only for java
         vim.api.nvim_create_autocmd("FileType", {
             pattern = "java",
-            group = java_cmds,
+            group = java_augr,
             desc = TAG .. " start_or_attach",
             callback = function()
                 vim.notify("[JDTLS]: start_or_attach", vim.log.levels.INFO)
