@@ -80,36 +80,48 @@ return {
                 }),
 
                 -- https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources
-                sources = cmp.config.sources({
-                    { name = "nvim_lsp" },
-                    { name = "luasnip" }, -- For luasnip users.
-                    { name = "nvim_lsp_signature_help" },
-                    { name = "path" },
-                    { name = "codeium" },
-                }, {
-                    { name = 'buffer' },
-                })
+                sources = cmp.config.sources(
+                    {
+                        { name = "nvim_lsp" },
+                        { name = "luasnip" }, -- For luasnip users.
+                        { name = "nvim_lsp_signature_help" },
+                        { name = "path" },
+                        { name = "codeium" },
+                    },
+                    {
+                        { name = 'buffer' },
+                    })
             })
-            -- databases, sql... , plugin vim-dadbod (autocompletion when accessing databases)
+
+            -- filetype specific -> `cmp.setup.filetype`  overrides `cmp.config.sources`
+
+            -- databases, sql... , requires plugin vim-dadbod (autocompletion when accessing databases)
             cmp.setup.filetype({ "sql", "mysql", "plsql" }, {
                 sources = cmp.config.sources({
                         { name = "nvim_lsp" },
+                        { name = "luasnip" },
+                        { name = "nvim_lsp_signature_help" },
                         { name = "vim-dadbod-completion" },
                         { name = 'sql' },
                         { name = "codeium" },
                     },
-                    { { name = 'buffer' }, })
+                    {
+                        { name = 'buffer' },
+                    })
             })
 
-            -- git
+            -- git (requires the plugin petertriho/cmp-git)
             cmp.setup.filetype({ "gitcommit", "octo", "NeogitCommitMessage" }, {
-
                 sources = cmp.config.sources({
                         { name = "nvim_lsp" },
+                        { name = "luasnip" },
+                        { name = "nvim_lsp_signature_help" },
+                        { name = "path" },
                         { name = 'git' },
                         { name = "codeium" },
                     },
-                    { { name = 'buffer' },
+                    {
+                        { name = 'buffer' },
                     }),
             })
 
@@ -121,11 +133,15 @@ return {
             -- tmux
             cmp.setup.filetype({ "tmux" }, {
                 sources = cmp.config.sources({
+                        { name = "nvim_lsp" },
+                        { name = "luasnip" },
                         { name = 'tmux' },
                         { name = "codeium" },
                         { name = "path" },
                     },
-                    { { name = 'buffer' }, })
+                    {
+                        { name = 'buffer' },
+                    })
             })
         end,
         dependencies = {
