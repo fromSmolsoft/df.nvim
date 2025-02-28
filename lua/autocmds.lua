@@ -1,4 +1,5 @@
 local autocmd_grps = { "saving", "highlight", "folding" }
+local vim = vim
 
 -- create autocmd groups
 -- @groups - table with group names

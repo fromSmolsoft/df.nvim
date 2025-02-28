@@ -30,20 +30,21 @@ return {
             require("which-key").add({ "<leader>f", group = "Find" })
 
             local builtin = require("telescope.builtin")
+            local keymap = vim.keymap
 
             -- Find
-            vim.keymap.set("n", "<C-p>", builtin.find_files, { desc = "Find file" })
-            vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find file" })
-            vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "Find command" })
-            vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffer" })
-            vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Find in files" })
-            vim.keymap.set("n", "<leader><leader>", ":Telescope oldfiles cwd_only=true<CR>", { desc = "Find oldFile" })
-            vim.keymap.set("n", "<leader>fo", ":Telescope oldfiles cwd_only=true<CR>", { desc = "Find oldFile" })
+            keymap.set("n", "<C-p>", builtin.find_files, { desc = "Find file" })
+            keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find file" })
+            keymap.set("n", "<leader>fc", builtin.commands, { desc = "Find command" })
+            keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffer" })
+            keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Find in files" })
+            keymap.set("n", "<leader><leader>", ":Telescope oldfiles cwd_only=true<CR>", { desc = "Find oldFile" })
+            keymap.set("n", "<leader>fo", ":Telescope oldfiles cwd_only=true<CR>", { desc = "Find oldFile" })
 
             -- Git
-            vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Git commits" })
-            vim.keymap.set("n", "<leader>gs", builtin.git_status, { desc = "Git diff" })
-            vim.keymap.set("n", "<leader>gb", builtin.git_stash, { desc = "Git stash" })
+            keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Git commits" })
+            keymap.set("n", "<leader>gs", builtin.git_status, { desc = "Git diff" })
+            keymap.set("n", "<leader>gb", builtin.git_stash, { desc = "Git stash" })
             require("telescope").load_extension("ui-select")
         end,
     },
