@@ -43,13 +43,15 @@ local function last_position()
 end
 
 -- set folding methods  depending on whether nvim-treesitter has parsers
+-- and add `import` folding
 local function set_foldingmethod()
     vim.api.nvim_create_autocmd({ "FileType" }, {
         group = "folding",
         callback = function()
             if require("nvim-treesitter.parsers").has_parser() then
                 vim.opt.foldmethod = "expr"
-                vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+                -- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+                vim.opt.foldexpr = "v:lnum==1?'>1':getline(v:lnum)=~'import'?1:nvim_treesitter#foldexpr()"
             else
                 vim.opt.foldmethod = "syntax"
             end
