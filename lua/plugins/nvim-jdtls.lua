@@ -17,7 +17,7 @@ local function install_or_skip(package_name)
     vim.cmd { cmd = "MasonInstall", args = { package_name } }
 end
 
-return {
+return { {
     -- https://github.com/mfussenegger/nvim-jdtls
     "mfussenegger/nvim-jdtls",
     dependencies = { "williamboman/mason.nvim" --[[ need for mason data]], },
@@ -207,4 +207,24 @@ return {
             end
         })
     end
-}
+}, {
+    -- https://github.com/elmcgill/springboot-nvim,
+    -- enable devtools to auto reload running app upon code change among other things
+    "elmcgill/springboot-nvim",
+    cond = false,
+    -- ft = "Java",
+    -- event = "VeryLazy",
+    opts = function()
+        -- extras
+        require("which-key").add({ "<leader>J", desc = "Java" })
+        local springboot_nvim = require("springboot-nvim")
+
+        vim.keymap.set('n', '<leader>Jr', springboot_nvim.boot_run, { desc = "[J]ava SpringBoot [R]un" })
+        vim.keymap.set('n', '<leader>Jc', springboot_nvim.generate_class, { desc = "[J]ava Create [C]lass" })
+        vim.keymap.set('n', '<leader>Ji', springboot_nvim.generate_interface, { desc = "[J]ava Create [I]nterface" })
+        vim.keymap.set('n', '<leader>Je', springboot_nvim.generate_enum, { desc = "[J]ava Create [E]num" })
+
+        -- "springboot-nvim" config
+        return {}
+    end
+}, }
