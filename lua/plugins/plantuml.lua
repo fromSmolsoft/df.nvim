@@ -1,6 +1,5 @@
 return
 {
-
     --- plantuml suntaxt highlighting ---
     {
         -- puml syntax (vim script plugin). https://github.com/aklt/plantuml-syntax

@@ -84,7 +84,8 @@ return {
                 end
             end
         end
-        bundles = vim.tbl_filter(function(bundle) return bundle ~= "" and not should_ignore_bundle(bundle) end, bundles)
+        bundles = vim.tbl_filter(function(bundle) return bundle ~= "" and not should_ignore_bundle(bundle) end,
+            bundles)
 
         -- Command to start jdtls
         local cmd = {
