@@ -85,6 +85,11 @@ return
         config = function()
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             capabilities.textDocument.completion.completionItem.snippetSupport = true
+            -- enhanced folding with "nvim-ufo"
+            -- capabilities.textDocument.foldingRange = {
+            --     dynamicRegistration = false,
+            --     lineFoldingOnly = true
+            -- }
             local lspconfig = require("lspconfig")
             vim_api.nvim_create_autocmd("LspAttach", {
                 group = Lsp_augrp,
