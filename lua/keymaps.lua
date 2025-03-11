@@ -19,7 +19,10 @@ vkey.set('n', '<leader>cx', ':windo diffoff<CR>', { desc = "Diff off" })
 vkey.set('n', '<leader>bd', ':%bd|e#<CR>', { desc = "Close saved buffers" })
 vkey.set('n', '<leader>bp', ':buffer#<CR>', { desc = "↹ Previous buffer" })
 vkey.set('n', '<leader><Tab>', ':buffer#<CR>', { desc = "↹ Previous buffer" })
---
+
 -- searches
 vkey.set('n', '<leader>h', ':nohlsearch<CR>')
 vkey.set('n', '<leader>*', '*#:%s///gc<left><left><left>', { desc = "Search & replace" })
+
+-- "terminal" with tmux split
+vkey.set('n', "<leader>xt", "<cmd>!tmux split-window -p 20<CR>", { desc = "[t]mux split" })
