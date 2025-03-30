@@ -95,26 +95,31 @@ return
                 group = Lsp_augrp,
                 desc = "Lsp Actions",
                 callback = function(event)
-                    -- keymaps
+
+                    -- Key-mapping
                     local opts = { buffer = event.buf }
                     --- create which key groups
                     local whichkey_groups = function()
                         local wk = require("which-key")
                         if wk ~= nil then
-                            wk.add({ "<leader>g", group = "Lsp" })
-                            wk.add({ "<leader>gr", group = "Reference" })
-                            wk.add({ "<leader>c", group = "Code" })
+                            wk.add({ "<leader>g", group = "lsp" })
+                            wk.add({ "gr", group = "lsp" })
+                            wk.add({ "<leader>gr", group = "lsp/reference" })
+                            wk.add({ "<leader>c", group = "code" })
                         end
                     end
                     whichkey_groups()
                     local keymap = vim.keymap
-                    keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
-                    keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "Format" })
-                    keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
-                    keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Definition" })
-                    keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "Reference" })
-                    keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "Rename references" })
-                    keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+                    -- keymap.set("n", "<leader>gri", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
+                    keymap.set("n", "<leader>gri", vim.lsp.buf.implementation, { desc = "implementation" })
+                    keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "format" })
+                    keymap.set("n", "K", vim.lsp.buf.hover, { desc = "hover" })
+                    keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "definition" })
+                    keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "reference" })
+                    keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "rename" })
+                    keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "actions" })
+                    keymap.set({ "n", "v" }, "<leader>gra", vim.lsp.buf.code_action, { desc = "actions" })
+
                     -- configure lsp in-line diagnostics
                     local diagnostic = vim.diagnostic
                     diagnostic.config({
