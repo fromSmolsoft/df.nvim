@@ -6,7 +6,7 @@ local Lsp_augrp = vim_api.nvim_create_augroup("lsp_augrp", { clear = false })
 local mason_registry = require("mason-registry")
 
 ---Mason package item.
----@param name string name of mason package eg. `"lua_ls"`
+---@param name string name of mason package e.g. `"lua_ls"`
 ---@param ...table Optional package configuration
 ---@return table package_and_config `{name, configuration}`
 local function create_pckg(name, ...)
@@ -55,7 +55,7 @@ return
     {
         "williamboman/mason-lspconfig.nvim", -- https://github.com/williamboman/mason-lspconfig.nvim
         opts = {
-            -- Automatically installed servers. eg. { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
+            -- Automatically installed servers. E.g. { "lua_ls", "jdtls", "marksman", "ruff", "pyright", "taplo" },
             ensure_installed = { "lua_ls", },
 
             -- (not reliable)Supposed to auto-install servers after they are set up
@@ -72,7 +72,7 @@ return
         },
     },
     {
-        -- https://github.com/folke/neoconf.nvim, switching custom lsp configurations per project or globally by loading json
+        -- https://github.com/folke/neoconf.nvim, switching custom LSP configurations per project or globally by loading JSON
         "folke/neoconf.nvim",
         enabled = false,
         opts = {},
@@ -95,7 +95,6 @@ return
                 group = Lsp_augrp,
                 desc = "Lsp Actions",
                 callback = function(event)
-
                     -- Key-mapping
                     local opts = { buffer = event.buf }
                     --- create which key groups
@@ -120,7 +119,7 @@ return
                     keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "actions" })
                     keymap.set({ "n", "v" }, "<leader>gra", vim.lsp.buf.code_action, { desc = "actions" })
 
-                    -- configure lsp in-line diagnostics
+                    -- configure LSP in-line diagnostics
                     local diagnostic = vim.diagnostic
                     diagnostic.config({
                         severity_sort = true,
@@ -166,7 +165,7 @@ return
                 },
             }
 
-            -- all ls mason names and their configurations
+            -- All ls mason names and their configurations
             local lsps = {
                 create_pckg("jdtls", {}),
                 create_pckg("marksman", ls_default_conf),
@@ -215,8 +214,8 @@ return
                 return package_names
             end
 
-            ---batch call setup_ls()
-            ---@param ls_list table list of mason_packages eg. `packages = { item1 = {name = "name", config = {}}, item2..., item3.., .... }`
+            ---Batch call setup_ls()
+            ---@param ls_list table list of mason_packages e.g. `packages = { item_1 = {name = "name", config = {}}, item_2..., item_3.., .... }`
             local setup_ls_in_batch = function(ls_list)
                 for _, value in pairs(ls_list) do
                     local name, conf = value.name, value.configuration
@@ -237,7 +236,7 @@ return
         -- config = function(_, opts) require "lsp_signature".setup(opts) end,
     },
     {
-        "nvimtools/none-ls.nvim", -- provides hook for non-lsp tools to hook into its lsp client (linters,formatters,..)
+        "nvimtools/none-ls.nvim", -- Provides hook for non-LSP tools to hook into its LSP client (linters, formatters, ...)
         enabled = true,
         dependencies = { "nvim-lua/plenary.nvim", lazy = true },
         config = function()
@@ -256,7 +255,7 @@ return
             }
             local sh_ft = { "sh", }
 
-            -- key is none_ls builtins', value is package name in mason_registry. Packages can be duplicated.
+            -- key = none_ls built-ins, value = package name in mason_registry. Packages can be duplicated.
             local builtins_to_mason = {
 
                 -- formatters
@@ -304,7 +303,7 @@ return
                     -- diagnostics --
                     null_diagnostics.npm_groovy_lint.with({
                         filetypes = groovy,
-                        disabled_filetypes = { "java" }, -- filetypes has to specifically not include java or it lints Java in weird way
+                        disabled_filetypes = { "java" }, -- Filetypes has to specifically not include java or it lints Java in weird way
                     }),
                     null_diagnostics.gitlint,
                     null_diagnostics.sqlfluff.with({
@@ -312,7 +311,7 @@ return
                         extra_args = sqlfluff_args, -- change to your dialect
                     }),
 
-                    -- null_diagnostics.shellcheck,      -- deprecated,  bash
+                    -- null_diagnostics.shellcheck,      -- deprecated, bash
 
                     --code_actions
                     -- null_actions.gitsigns, -- gitsisgns

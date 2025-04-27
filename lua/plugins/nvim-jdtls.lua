@@ -87,7 +87,7 @@ return { {
         bundles = vim.tbl_filter(function(bundle) return bundle ~= "" and not should_ignore_bundle(bundle) end,
             bundles)
 
-        -- Command to start jdtls
+        -- Command to start JDTLS
         local cmd = {
             java,
             "-Declipse.application=org.eclipse.jdt.ls.core.id1",
