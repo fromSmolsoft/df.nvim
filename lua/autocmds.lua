@@ -57,6 +57,7 @@ local function set_foldingmethod()
             end
             -- disable folding on startup
             vim.opt.foldenable = false
+            vim.opt.foldlevel = 20
         end,
     })
 end
