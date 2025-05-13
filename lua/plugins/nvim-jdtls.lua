@@ -36,7 +36,7 @@ return { {
         -- Mason
         local mason_path = vim.fn.glob(vim.fn.stdpath "data" .. "/mason/")
         install_or_skip("jdtls") -- INFO:Mason has bug -> prevents installing versions eg. `jdtls@1.43.0`
-        local jdtls_path = mason_registry.get_package("jdtls"):get_install_path()
+        local jdtls_path = vim.fn.expand "$MASON/packages/jdtls/"
 
         -- path to java 21+ / jdtls executable
         local java = jdtls_path .. "/jdtls"
