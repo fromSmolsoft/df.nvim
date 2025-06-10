@@ -178,7 +178,16 @@ return
                 create_pckg("powershell_es", ls_default_conf),
                 create_pckg("gradle_ls", ls_default_conf),
                 create_pckg("lemminx", ls_default_conf),
-                create_pckg("harper_ls", ls_default_conf),
+                create_pckg("harper_ls", {
+                    settings = {
+                        ["harper-ls"] = {
+                            linters = {
+                                SentenceCapitalization = false,
+                                SpellCheck = false
+                            }
+                        }
+                    }
+                }),
                 create_pckg("lua_ls", {
                     capabilities = capabilities,
                     settings = {
