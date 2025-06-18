@@ -196,6 +196,7 @@ return { {
             pattern = "java",
             group = java_augr,
             desc = TAG .. " start_or_attach",
+            -- TODO: Key-map to toggle JDTLS by nesting it inside this auto-command 
             callback = function()
                 vim.notify("[JDTLS]: start_or_attach", vim.log.levels.INFO)
                 local success, result = pcall(require("jdtls").start_or_attach, opts)
