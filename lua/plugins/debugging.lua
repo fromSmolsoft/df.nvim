@@ -14,7 +14,7 @@ return
                 --     'github:nvim-java/mason-registry',
                 --     'github:mason-org/mason-registry',
                 -- },
-                ensure_installed = { "java-debug-adapter", "java-test" }
+                ensure_installed = { "java-debug-adapter", "java-test", "bash-debug-adapter" }
             },
 
         },
@@ -55,6 +55,7 @@ return
                     terminalKind = "integrated",
                 }
             }
+            dap.configurations.bash = dap.configurations.sh
 
             -- dapui
             ui.setup()
