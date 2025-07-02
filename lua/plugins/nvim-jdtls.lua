@@ -93,14 +93,28 @@ return { {
             "-Declipse.application=org.eclipse.jdt.ls.core.id1",
             "-Dosgi.bundles.defaultStartLevel=4",
             "-Declipse.product=org.eclipse.jdt.ls.core.product",
-            "-Xmx1G",
             "-Dlog.protocol=false", -- true,false
             "-Dlog.level=ERROR",    -- ALL,ERROR,...
+            -- "-Xms512M",             -- min heap size
+            "-Xmx2G",               -- max heap size
+
+            -- Performance optimizations
+            -- "-XX:TieredStopAtLevel=1",          -- Disable C2 compiler, use only C1
+            "-XX:+UseZGC", -- Use ZGC (Low-latency) garbage collector
+            "-XX:+ZGenerational",
+            -- AppCDS (uncomment after creating shared archive)
+            -- "-XX:+AutoCreateSharedArchive",    -- Automatic archive creation and management
+            -- "-XX:SharedArchiveFile=" .. workspace_path .. "/jdtls.jsa",  -- Path to shared archive file
+            -- "-Xshare:on",                      -- Enable shared archive usage
+
+            -- Module system and security
             "--add-modules=ALL-SYSTEM",
             "--add-opens", "java.base/java.util=ALL-UNNAMED",
             "--add-opens", "java.base/java.lang=ALL-UNNAMED",
             "--enable-native-access=ALL-UNNAMED",
             "--jvm-arg=-javaagent:" .. lombok_path,
+
+            -- JAR and configuration
             "-jar", launcher,
             "-configuration", path_to_config,
             "-data", workspace_path,
