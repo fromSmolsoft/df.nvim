@@ -149,6 +149,8 @@ return { {
                         },
                         completion = {
                             favoriteStaticMembers = {
+                                "org.assertj.core.api.Assertions.assertThat",
+                                "org.assertj.core.api.Assertions.*",
                                 "org.hamcrest.MatcherAssert.assertThat",
                                 "org.hamcrest.Matchers.*",
                                 "org.hamcrest.CoreMatchers.*",
