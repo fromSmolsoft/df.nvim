@@ -1,8 +1,8 @@
 local autocmd_grps = { "AutosaveGroup", "highlight", "folding" }
 local vim = vim
 
--- create autocmd groups
--- @groups - table with group names
+--- Create autocmd groups
+--- @groups - table with group names
 local function create_groups(groups)
     for _, value in ipairs(groups) do
         vim.api.nvim_create_augroup(value, { clear = false })
@@ -19,7 +19,7 @@ local function highlight_on_yank()
     })
 end
 
--- Jump to last position v.3  [source nvim issue 16339](https://github.com/neovim/neovim/issues/16339#issuecomment-1457394370)
+--- Jump to last position v.3  [source nvim issue 16339](https://github.com/neovim/neovim/issues/16339#issuecomment-1457394370)
 local function last_position()
     vim.api.nvim_create_autocmd('BufRead', {
         callback = function(opts)
@@ -42,8 +42,7 @@ local function last_position()
     })
 end
 
--- set folding methods  depending on whether nvim-treesitter has parsers
--- and add `import` folding
+--- Set folding methods  depending on whether nvim-treesitter has parsers and add `import` folding
 local function set_foldingmethod()
     vim.api.nvim_create_autocmd({ "FileType" }, {
         group = "folding",
