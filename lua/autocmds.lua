@@ -1,4 +1,4 @@
-local autocmd_grps = { "saving", "highlight", "folding" }
+local autocmd_grps = { "AutosaveGroup", "highlight", "folding" }
 local vim = vim
 
 -- create autocmd groups
@@ -62,69 +62,63 @@ local function set_foldingmethod()
     })
 end
 
--- Autosave on exiting insert mode and text change like formatting
-local function autosave()
+
+--- Save the current buffer if it was modified and meets all conditions.
+---
+--- Throttles saves so that disk writes occur at most once per `save_interval`
+--- milliseconds, and adds an optional debounce delay after exiting insert mode.
+---
+--- @see vim.uv.now
+--- @see vim.defer_fn
+---
+--- @param save_interval integer Minimum interval between saves, in ms.
+--- @param exit_wait_time integer Debounce delay after InsertLeave, in ms.
+--- @return nil
+local function autosave(save_interval, exit_wait_time)
+    --- @type integer
     local last_save_time = 0
-    local save_interval = 10000 -- 10 seconds in milliseconds
-    local exit_wait_time = 5000 -- 05 seconds wait after InsertLeave
+    --- @type integer|nil
     local pending_timer = nil
 
+    --- Check whether the buffer should be saved.
+    --- @return boolean True if buffer is modifiable, modified, and not special.
     local function should_save()
-        if vim.bo.readonly
-            or vim.api.nvim_buf_get_name(0) == ''
-            or vim.bo.buftype ~= ''
-            or not (vim.bo.modifiable and vim.bo.modified)
-        then
-            return false
-        end
-        return true
+        local ft = vim.bo.ft
+        return not vim.bo.readonly
+            and vim.api.nvim_buf_get_name(0) ~= ""
+            and vim.bo.buftype == ""
+            and vim.bo.modifiable
+            and vim.bo.modified
+            and not (ft:match('commit') and ft:match('rebase') and ft:match('gitcommit') and ft:match('gitrebase'))
     end
 
+    --- Perform the actual save if enough time has elapsed.
     local function perform_save()
         if not should_save() then
             return
         end
-
-        local current_time = vim.uv.now()
-        if current_time - last_save_time >= save_interval then
-            last_save_time = current_time
-            vim.notify("saving", vim.log.levels.INFO)
-            vim.cmd('silent w')
-            vim.cmd('doau BufWritePost')
+        local now = vim.uv.now()
+        if now - last_save_time >= save_interval then
+            last_save_time = now
+            vim.notify("autosave", vim.log.levels.INFO)
+            vim.cmd("silent write")
+            vim.cmd("doautocmd BufWritePost")
         end
     end
 
-    vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave" }, {
-        group = vim.api.nvim_create_augroup("saving", { clear = true }),
+    -- Create augroup (cleared) and autocmds
+    local group_id = vim.api.nvim_create_augroup("AutosaveGroup", { clear = true })
+
+    -- Immediate on text change; throttled by interval
+    vim.api.nvim_create_autocmd("TextChanged", {
+        group = group_id,
         pattern = "*",
-        callback = function(args)
-            if not should_save() then
-                return
-            end
-
-            -- Cancel any pending timer
-            if pending_timer then
-                pending_timer:stop()
-                pending_timer:close()
-                pending_timer = nil
-            end
-
-            if args.event == "InsertLeave" then
-                -- Wait 5 seconds after exiting insert mode
-                pending_timer = vim.defer_fn(function()
-                    perform_save()
-                    pending_timer = nil
-                end, exit_wait_time)
-            else
-                -- TextChanged - immediate check with interval throttling
-                perform_save()
-            end
-        end
+        callback = perform_save,
     })
 
-    -- Cancel pending save if user re-enters insert mode
-    vim.api.nvim_create_autocmd("InsertEnter", {
-        group = vim.api.nvim_create_augroup("saving_cancel", { clear = true }),
+    -- On exiting insert: debounce via vim.defer_fn
+    vim.api.nvim_create_autocmd("InsertLeave", {
+        group = group_id,
         pattern = "*",
         callback = function()
             if pending_timer then
@@ -132,7 +126,24 @@ local function autosave()
                 pending_timer:close()
                 pending_timer = nil
             end
-        end
+            pending_timer = vim.defer_fn(function()
+                perform_save()
+                pending_timer = nil
+            end, exit_wait_time)
+        end,
+    })
+
+    -- Cancel pending save if re-entering Insert mode
+    vim.api.nvim_create_autocmd("InsertEnter", {
+        group = group_id,
+        pattern = "*",
+        callback = function()
+            if pending_timer then
+                pending_timer:stop()
+                pending_timer:close()
+                pending_timer = nil
+            end
+        end,
     })
 end
 
@@ -144,4 +155,4 @@ create_groups(autocmd_grps)
 highlight_on_yank()
 last_position()
 set_foldingmethod()
-autosave()
+autosave(10000, 5000)
