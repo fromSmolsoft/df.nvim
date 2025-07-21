@@ -64,6 +64,10 @@ end
 
 -- Autosave on exiting insert mode and text change like formatting
 local function autosave()
+    local last_save_time = 0
+    local save_interval = 10000 -- milliseconds
+
+
     vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave" }, {
         group = "saving",
         pattern = "*",
@@ -76,9 +80,14 @@ local function autosave()
             then
                 return
             end
-            vim.notify("saving", vim.log.levels.INFO)
-            vim.cmd('silent w')
-            vim.cmd('doau BufWritePost')
+
+            local current_time = vim.uv.now()
+            if current_time - last_save_time >= save_interval then
+                vim.notify("saving", vim.log.levels.INFO)
+                vim.cmd('silent w')
+                vim.cmd('doau BufWritePost')
+                last_save_time = current_time
+            end
         end
 
     })
