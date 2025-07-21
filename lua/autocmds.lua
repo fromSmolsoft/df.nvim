@@ -65,31 +65,74 @@ end
 -- Autosave on exiting insert mode and text change like formatting
 local function autosave()
     local last_save_time = 0
-    local save_interval = 10000 -- milliseconds
+    local save_interval = 10000 -- 10 seconds in milliseconds
+    local exit_wait_time = 5000 -- 05 seconds wait after InsertLeave
+    local pending_timer = nil
 
+    local function should_save()
+        if vim.bo.readonly
+            or vim.api.nvim_buf_get_name(0) == ''
+            or vim.bo.buftype ~= ''
+            or not (vim.bo.modifiable and vim.bo.modified)
+        then
+            return false
+        end
+        return true
+    end
+
+    local function perform_save()
+        if not should_save() then
+            return
+        end
+
+        local current_time = vim.uv.now()
+        if current_time - last_save_time >= save_interval then
+            last_save_time = current_time
+            vim.notify("saving", vim.log.levels.INFO)
+            vim.cmd('silent w')
+            vim.cmd('doau BufWritePost')
+        end
+    end
 
     vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave" }, {
-        group = "saving",
+        group = vim.api.nvim_create_augroup("saving", { clear = true }),
         pattern = "*",
-        callback = function()
-            if
-                vim.bo.readonly
-                or vim.api.nvim_buf_get_name(0) == ''
-                or vim.bo.buftype ~= ''
-                or not (vim.bo.modifiable and vim.bo.modified)
-            then
+        callback = function(args)
+            if not should_save() then
                 return
             end
 
-            local current_time = vim.uv.now()
-            if current_time - last_save_time >= save_interval then
-                vim.notify("saving", vim.log.levels.INFO)
-                vim.cmd('silent w')
-                vim.cmd('doau BufWritePost')
-                last_save_time = current_time
+            -- Cancel any pending timer
+            if pending_timer then
+                pending_timer:stop()
+                pending_timer:close()
+                pending_timer = nil
+            end
+
+            if args.event == "InsertLeave" then
+                -- Wait 5 seconds after exiting insert mode
+                pending_timer = vim.defer_fn(function()
+                    perform_save()
+                    pending_timer = nil
+                end, exit_wait_time)
+            else
+                -- TextChanged - immediate check with interval throttling
+                perform_save()
             end
         end
+    })
 
+    -- Cancel pending save if user re-enters insert mode
+    vim.api.nvim_create_autocmd("InsertEnter", {
+        group = vim.api.nvim_create_augroup("saving_cancel", { clear = true }),
+        pattern = "*",
+        callback = function()
+            if pending_timer then
+                pending_timer:stop()
+                pending_timer:close()
+                pending_timer = nil
+            end
+        end
     })
 end
 
