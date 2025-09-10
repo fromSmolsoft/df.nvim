@@ -1,5 +1,5 @@
 return {
-    "jsstevenson/nvim-tmux",
+    "jsstevenson/nvim-tmux", -- edit Tmux configuration https://github.com/jsstevenson/nvim-tmux
     -- event = "VeryLazy",
     ft = "tmux",
     dependencies = { "nvim-lua/plenary.nvim" },
