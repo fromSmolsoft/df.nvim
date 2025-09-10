@@ -259,6 +259,8 @@ return
                         client.server_capabilities.documentRangeFormattingProvider = false
                     end,
                 }),
+                create_pckg("cssls", ls_default_conf),
+                create_pckg("tailwindcss", ls_default_conf),
             }
 
             local get_package_names = function(ls_list)
