@@ -169,8 +169,64 @@ return
             local lsps = {
                 create_pckg("jdtls", {}),
                 create_pckg("marksman", ls_default_conf),
-                create_pckg("pyright", ls_default_conf),
-                create_pckg("ruff", ls_default_conf),
+                -- create_pckg("pyright", ls_default_conf),
+                create_pckg("pyright", {
+                    capabilities = capabilities,
+                    on_attach = function(...) end, -- your usual on_attach
+                    settings = {
+                        python = {
+                            -- 1) interpreter lookup
+                            pythonPath = (function()
+                                local cwd = vim.fn.getcwd()
+                                local candidates = {
+                                    cwd .. "/.uv/venv/bin/python", -- UV venv
+                                    cwd .. "/.venv/bin/python",    -- Poetry / PEP 582
+                                    cwd .. "/venv/bin/python",     -- venv/
+                                    cwd .. "/env/bin/python",      -- env/
+                                }
+                                for _, py in ipairs(candidates) do
+                                    if vim.fn.executable(py) == 1 then
+                                        return py
+                                    end
+                                end
+                                return "python" -- fallback to $PATH
+                            end)(),
+
+                            -- 2) tell Pyright where to look for its venvs
+                            venvPath = (function()
+                                local cwd = vim.fn.getcwd()
+                                if vim.fn.isdirectory(cwd .. "/.uv/venv") == 1 then
+                                    return cwd .. "/.uv"
+                                elseif vim.fn.isdirectory(cwd .. "/.venv") == 1 then
+                                    return cwd
+                                else
+                                    return nil
+                                end
+                            end)(),
+
+                            -- 3) name of the venv folder inside venvPath
+                            venv = (function()
+                                if vim.fn.isdirectory(vim.fn.getcwd() .. "/.uv/venv") == 1 then
+                                    return "venv"
+                                elseif vim.fn.isdirectory(vim.fn.getcwd() .. "/.venv") == 1 then
+                                    return ".venv"
+                                else
+                                    return nil
+                                end
+                            end)(),
+                        },
+                    },
+                }),
+                create_pckg("ruff", {
+                    capabilities = capabilities,
+                    settings = {
+                        ruff = {
+                            -- fix for removing parts of pyproject.toml
+                            -- these args become: `ruff --fix --exclude=pyproject.toml`
+                            args = { "--fix", "--exclude=pyproject.toml" }
+                        }
+                    }
+                }),
                 create_pckg("ts_ls", ls_default_conf),
                 create_pckg("html", ls_default_conf),
                 create_pckg("bashls", ls_default_conf),
