@@ -26,8 +26,8 @@ return {
             highlight = { enable = true },
             indent = { enable = true },
             function()
-                vim.wo.foldmethod = 'expr'
-                vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+                -- vim.wo.foldmethod = 'expr'
+                -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
             end
         },
     }
