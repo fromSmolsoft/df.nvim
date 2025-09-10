@@ -11,7 +11,7 @@ return {
             },
         },
         lazy = false,
-        branch = "regexp", -- This is the regexp branch, use this for the new version
+        -- branch = "regexp", -- This is the regexp branch, use this for the new version
         opts = {},
         keys = {
             { ",v", "<cmd>VenvSelect<cr>" },
