@@ -46,14 +46,33 @@ end
 local function set_foldingmethod()
     vim.api.nvim_create_autocmd({ "FileType" }, {
         group = "folding",
+        -- enable = false ,
         callback = function()
-            if require("nvim-treesitter.parsers").has_parser() then
-                vim.opt.foldmethod = "expr"
-                -- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-                vim.opt.foldexpr = "v:lnum==1?'>1':getline(v:lnum)=~'import'?1:nvim_treesitter#foldexpr()"
-            else
-                vim.opt.foldmethod = "syntax"
-            end
+            vim.defer_fn(function()
+                if require("nvim-treesitter.parsers").has_parser() then
+                    vim.wo.foldmethod = "expr"
+                    -- vim.wo.foldexpr = "nvim_treesitter#foldexpr()" -- old way
+                    vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+                    -- vim.wo.foldexpr = "v:lnum==1?'>1':getline(v:lnum)=~'import'?1:nvim_treesitter#foldexpr()"
+                else
+                    vim.wo.foldmethod = "syntax"
+                end
+            end, 2000)
+
+
+
+            -- local has_parser = pcall(function()
+            --     return require("nvim-treesitter.parsers").has_parser()
+            -- end) and require("nvim-treesitter.parsers").has_parser()
+            --
+            -- if has_parser then
+            --     vim.wo.foldmethod = "expr"
+            --     vim.wo.foldexpr   = "nvim_treesitter#foldexpr()"
+            -- else
+            --     vim.wo.foldmethod = "syntax"
+            -- end
+            --
+            --
             -- disable folding on startup
             vim.opt.foldenable = false
             vim.opt.foldlevel = 20
@@ -124,6 +143,7 @@ local function autosave(save_interval, exit_wait_time)
                 pending_timer:stop()
                 pending_timer:close()
                 pending_timer = nil
+                set_foldingmethod()
             end
             pending_timer = vim.defer_fn(function()
                 perform_save()
