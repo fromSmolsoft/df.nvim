@@ -108,7 +108,7 @@ return
             ensure_installed = { "lua_ls", },
 
             -- (not reliable)Supposed to auto-install servers after they are set up
-            automatic_installation = true,
+            automatic_installation = false,
 
             -- use alongside `nvim-jdtls` plugin
             function(server_name)
@@ -318,7 +318,7 @@ return
                     options = { formatting_priority = 1 },
                 }),
                 create_pckg({ name = "ts_ls", config = ls_default_conf, options = { disable_formatting = true } }),
-                create_pckg({ name = "html", config = ls_default_conf }),
+                create_pckg({ name = "html", config = ls_default_conf, options = { disable_formatting = true } }),
                 create_pckg({ name = "bashls", config = ls_default_conf }),
                 create_pckg({ name = "taplo", config = ls_default_conf }),
                 create_pckg({ name = "powershell_es", config = ls_default_conf }),
@@ -343,7 +343,8 @@ return
                                 telemetry = { enable = false, },
                             },
                         },
-                    }
+                    },
+                    options = { formatting_priority = 1 }
                 }),
                 create_pckg({
                     name = "sqls",
@@ -358,7 +359,6 @@ return
                 create_pckg({ name = "cssls", config = ls_default_conf }),
                 create_pckg({ name = "tailwindcss", config = ls_default_conf }),
             }
-
             local get_package_names = function(ls_list)
                 local package_names = {}
                 for _, value in pairs(ls_list) do
@@ -376,7 +376,6 @@ return
                     if conf == true or next(conf) ~= nil then lspconfig[name].setup(conf) end
                 end
             end
-
             local package_names = get_package_names(lsps)
             install_mason_packages(get_missing_packages(package_names))
             setup_ls_in_batch(lsps)
@@ -395,7 +394,6 @@ return
         dependencies = { "nvim-lua/plenary.nvim", lazy = true },
         config = function()
             local null_ls = require("null-ls")
-
             local sql_ft = { "sql", }
             local sqlfluff_args = { "--dialect", "postgres" }
             local groovy = { "groovy", "Jenkinsfile" }
@@ -446,8 +444,8 @@ return
                     null_formatter.cbfmt.with({ filetypes = markdown }), -- format code blocks in markdown``
                     null_formatter.npm_groovy_lint.with({ filetypes = groovy }),
 
-                    null_formatter.shellharden.with({ filetypes = sh_ft }),
-                    null_formatter.shfmt.with({ filetypes = sh_ft }),
+                    null_formatter.shellharden.with({ filetypes = sh_ft }), --adds missing quotes etc (security)
+                    null_formatter.shfmt.with({ filetypes = sh_ft }),       -- pretty format (style)
 
                     null_formatter.sqlfluff.with({
                         filetypes = sql_ft,
