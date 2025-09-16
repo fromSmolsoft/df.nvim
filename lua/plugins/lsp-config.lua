@@ -18,7 +18,7 @@ local mason_registry = require("mason-registry")
 ---@field config table? LSP server configuration options
 ---@field options MasonPackageOptions? Formatting control options
 ---
----@param package_conf MasonPackageConfig Package configuration with name, config, and options
+---@param pckg_conf MasonPackageConfig Package configuration with name, config, and options
 ---@return table package_and_config Package configuration: `{ name = string, configuration = table }`
 ---
 ---@usage
@@ -40,13 +40,10 @@ local mason_registry = require("mason-registry")
 ---```
 ---@see mason-lspconfig.nvim For available package names
 ---@see lspconfig For configuration options
-local function create_pckg(package_conf)
-    local name = package_conf.name or {}
-    local config = package_conf.config or {}
-    local options = package_conf.options or {}
-    -- config = config or {}
-    -- options = options or {}
-
+local function create_pckg(pckg_conf)
+    local name = pckg_conf.name or {}
+    local config = pckg_conf.config or {}
+    local options = pckg_conf.options or {}
     if options.disable_formatting then
         local original_on_attach = config.on_attach
         config.on_attach = function(client, bufnr)
@@ -63,7 +60,6 @@ local function create_pckg(package_conf)
             end
         end
     end
-
     return { name = name, configuration = config or {} }
 end
 
