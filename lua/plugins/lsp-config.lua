@@ -5,12 +5,65 @@ local notify = vim.notify
 local Lsp_augrp = vim_api.nvim_create_augroup("lsp_augrp", { clear = false })
 local mason_registry = require("mason-registry")
 
----Mason package item.
----@param name string name of mason package e.g. `"lua_ls"`
----@param ...table Optional package configuration
----@return table package_and_config `{name, configuration}`
-local function create_pckg(name, ...)
-    local config = ...
+---Creates a Mason package configuration with optional formatting control.
+---
+---This function creates a standardized configuration object for Mason LSP packages
+---with support for formatting behavior customization and priority settings.
+---@class MasonPackageOptions
+---@field disable_formatting boolean? Disable LSP formatting capabilities
+---@field formatting_priority integer? Priority level (1 = highest, 999 = lowest)
+
+---@class MasonPackageConfig
+---@field name string Mason package name (e.g., "lua_ls", "ts_ls")
+---@field config table? LSP server configuration options
+---@field options MasonPackageOptions? Formatting control options
+---
+---@param package_conf MasonPackageConfig Package configuration with name, config, and options
+---@return table package_and_config Package configuration: `{ name = string, configuration = table }`
+---
+---@usage
+---```
+----- Basic package without formatting options
+---create_pckg({ name = "lua_ls", config = { settings = { Lua = { ... } } } })
+----- Disable formatting (prefer external formatter)
+---create_pckg({
+---    name = "ts_ls",
+---    config = ls_default_conf,
+---    options = { disable_formatting = true }
+---})
+----- Set formatting priority
+---create_pckg({
+---    name = "ruff",
+---    config = ls_default_conf,
+---    options = { formatting_priority = 1 }
+---})
+---```
+---@see mason-lspconfig.nvim For available package names
+---@see lspconfig For configuration options
+local function create_pckg(package_conf)
+    local name = package_conf.name or {}
+    local config = package_conf.config or {}
+    local options = package_conf.options or {}
+    -- config = config or {}
+    -- options = options or {}
+
+    if options.disable_formatting then
+        local original_on_attach = config.on_attach
+        config.on_attach = function(client, bufnr)
+            client.server_capabilities.documentFormattingProvider = false
+            client.server_capabilities.documentFormattingProvider = false
+            if original_on_attach then original_on_attach(client, bufnr) end
+        end
+    elseif options.formatting_priority then
+        local original_on_attach = config.on_attach
+        config.on_attach = function(client, bufnr)
+            client._formatting_priority = options.formatting_priority
+            if original_on_attach then
+                original_on_attach(client, bufnr)
+            end
+        end
+    end
+
     return { name = name, configuration = config or {} }
 end
 
@@ -107,11 +160,45 @@ return
                             wk.add({ "<leader>c", group = "code" })
                         end
                     end
+
+                    -- Enhanced vim.lsp.buf.format. Shows used formater
+                    local function format_with_notification(bufnr)
+                        bufnr = bufnr or 0
+
+                        -- Get all clients attached to buffer that support formatting
+                        local clients = vim.lsp.get_clients({ bufnr = bufnr })
+                        local formatting_clients = {}
+
+                        for _, client in pairs(clients) do
+                            if client.supports_method("textDocument/formatting") then
+                                table.insert(formatting_clients, client.name)
+                            end
+                        end
+
+                        if #formatting_clients == 0 then
+                            vim.notify("No LSP formatters available", vim.log.levels.WARN)
+                            return
+                        end
+
+                        -- Show which formatters will be used
+                        local formatter_names = table.concat(formatting_clients, ", ")
+                        vim.notify(string.format("Formatting with: [%s]", formatter_names), vim.log.levels.INFO)
+
+                        -- Perform the actual formatting
+                        vim.lsp.buf.format({
+                            bufnr = bufnr,
+                            timeout_ms = 3000,
+                            async = false
+                        })
+                    end
+
                     whichkey_groups()
                     local keymap = vim.keymap
                     -- keymap.set("n", "<leader>gri", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
                     keymap.set("n", "<leader>gri", vim.lsp.buf.implementation, { desc = "implementation" })
-                    keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "format" })
+                    -- keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "format" })
+                    keymap.set({ "n", "v" }, "<leader>gf", function() format_with_notification(event.buf) end,
+                        { desc = "format", buffer = event.buf })
                     keymap.set("n", "K", vim.lsp.buf.hover, { desc = "hover" })
                     keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "definition" })
                     keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "reference" })
@@ -167,100 +254,113 @@ return
 
             -- All ls mason names and their configurations
             local lsps = {
-                create_pckg("jdtls", {}),
-                create_pckg("marksman", ls_default_conf),
+                create_pckg({ name = "jdtls" }),
+                create_pckg({ name = "marksman", config = ls_default_conf }),
                 -- create_pckg("pyright", ls_default_conf),
-                create_pckg("pyright", {
-                    capabilities = capabilities,
-                    on_attach = function(...) end, -- your usual on_attach
-                    settings = {
-                        python = {
-                            -- 1) interpreter lookup
-                            pythonPath = (function()
-                                local cwd = vim.fn.getcwd()
-                                local candidates = {
-                                    cwd .. "/.uv/venv/bin/python", -- UV venv
-                                    cwd .. "/.venv/bin/python",    -- Poetry / PEP 582
-                                    cwd .. "/venv/bin/python",     -- venv/
-                                    cwd .. "/env/bin/python",      -- env/
-                                }
-                                for _, py in ipairs(candidates) do
-                                    if vim.fn.executable(py) == 1 then
-                                        return py
+                create_pckg({
+                    name = "pyright",
+                    config = {
+                        capabilities = capabilities,
+                        on_attach = function(...) end, -- your usual on_attach
+                        settings = {
+                            python = {
+                                -- 1) interpreter lookup
+                                pythonPath = (function()
+                                    local cwd = vim.fn.getcwd()
+                                    local candidates = {
+                                        cwd .. "/.uv/venv/bin/python", -- UV venv
+                                        cwd .. "/.venv/bin/python",    -- Poetry / PEP 582
+                                        cwd .. "/venv/bin/python",     -- venv/
+                                        cwd .. "/env/bin/python",      -- env/
+                                    }
+                                    for _, py in ipairs(candidates) do
+                                        if vim.fn.executable(py) == 1 then
+                                            return py
+                                        end
                                     end
-                                end
-                                return "python" -- fallback to $PATH
-                            end)(),
+                                    return "python" -- fallback to $PATH
+                                end)(),
 
-                            -- 2) tell Pyright where to look for its venvs
-                            venvPath = (function()
-                                local cwd = vim.fn.getcwd()
-                                if vim.fn.isdirectory(cwd .. "/.uv/venv") == 1 then
-                                    return cwd .. "/.uv"
-                                elseif vim.fn.isdirectory(cwd .. "/.venv") == 1 then
-                                    return cwd
-                                else
-                                    return nil
-                                end
-                            end)(),
+                                -- 2) tell Pyright where to look for its venvs
+                                venvPath = (function()
+                                    local cwd = vim.fn.getcwd()
+                                    if vim.fn.isdirectory(cwd .. "/.uv/venv") == 1 then
+                                        return cwd .. "/.uv"
+                                    elseif vim.fn.isdirectory(cwd .. "/.venv") == 1 then
+                                        return cwd
+                                    else
+                                        return nil
+                                    end
+                                end)(),
 
-                            -- 3) name of the venv folder inside venvPath
-                            venv = (function()
-                                if vim.fn.isdirectory(vim.fn.getcwd() .. "/.uv/venv") == 1 then
-                                    return "venv"
-                                elseif vim.fn.isdirectory(vim.fn.getcwd() .. "/.venv") == 1 then
-                                    return ".venv"
-                                else
-                                    return nil
-                                end
-                            end)(),
+                                -- 3) name of the venv folder inside venvPath
+                                venv = (function()
+                                    if vim.fn.isdirectory(vim.fn.getcwd() .. "/.uv/venv") == 1 then
+                                        return "venv"
+                                    elseif vim.fn.isdirectory(vim.fn.getcwd() .. "/.venv") == 1 then
+                                        return ".venv"
+                                    else
+                                        return nil
+                                    end
+                                end)(),
+                            },
                         },
-                    },
-                }),
-                create_pckg("ruff", {
-                    capabilities = capabilities,
-                    settings = {
-                        ruff = {
-                            -- fix for removing parts of pyproject.toml
-                            -- these args become: `ruff --fix --exclude=pyproject.toml`
-                            args = { "--fix", "--exclude=pyproject.toml" }
-                        }
                     }
                 }),
-                create_pckg("ts_ls", ls_default_conf),
-                create_pckg("html", ls_default_conf),
-                create_pckg("bashls", ls_default_conf),
-                create_pckg("taplo", ls_default_conf),
-                create_pckg("powershell_es", ls_default_conf),
-                create_pckg("gradle_ls", ls_default_conf),
-                create_pckg("lemminx", ls_default_conf),
-                -- create_pckg("harper_ls", { settings = { ["harper-ls"] = { linters = { SentenceCapitalization = false, SpellCheck = false } } } }),
-                create_pckg("lua_ls", {
-                    capabilities = capabilities,
-                    settings = {
-                        Lua = {
-                            init_options = {
-                                -- Most likely not needed anymore due to capabilities' config
-                                usePlaceholders = true,
-                            },
-                            diagnostics = { globals = { "vim", "describe", "it", "before_each", "after_each" }, },
-                            workspace = {
-                                -- Make the server aware of Neovim runtime files
-                                library = vim_api.nvim_get_runtime_file("", true),
-                            },
-                            telemetry = { enable = false, },
-                        },
+                create_pckg({
+                    name = "ruff",
+                    config = {
+                        capabilities = capabilities,
+                        settings = {
+                            ruff = {
+                                -- fix for removing parts of pyproject.toml
+                                -- these args become: `ruff --fix --exclude=pyproject.toml`
+                                args = { "--fix", "--exclude=pyproject.toml" }
+                            }
+                        }
                     },
+                    options = { formatting_priority = 1 },
                 }),
-                create_pckg("sqls", {
-                    on_attach = function(client, _)
-                        capabilities = capabilities
-                        client.server_capabilities.documentFormattingProvider = false
-                        client.server_capabilities.documentRangeFormattingProvider = false
-                    end,
+                create_pckg({ name = "ts_ls", config = ls_default_conf, options = { disable_formatting = true } }),
+                create_pckg({ name = "html", config = ls_default_conf }),
+                create_pckg({ name = "bashls", config = ls_default_conf }),
+                create_pckg({ name = "taplo", config = ls_default_conf }),
+                create_pckg({ name = "powershell_es", config = ls_default_conf }),
+                create_pckg({ name = "gradle_ls", config = ls_default_conf }),
+                create_pckg({ name = "lemminx", config = ls_default_conf }),
+                -- create_pckg({name=  "harper_ls", config ={ settings = { ["harper-ls"] = { linters = { SentenceCapitalization = false, SpellCheck = false } } } }}),
+                create_pckg({
+                    name = "lua_ls",
+                    config = {
+                        capabilities = capabilities,
+                        settings = {
+                            Lua = {
+                                init_options = {
+                                    -- Most likely not needed anymore due to capabilities' config
+                                    usePlaceholders = true,
+                                },
+                                diagnostics = { globals = { "vim", "describe", "it", "before_each", "after_each" }, },
+                                workspace = {
+                                    -- Make the server aware of Neovim runtime files
+                                    library = vim_api.nvim_get_runtime_file("", true),
+                                },
+                                telemetry = { enable = false, },
+                            },
+                        },
+                    }
                 }),
-                create_pckg("cssls", ls_default_conf),
-                create_pckg("tailwindcss", ls_default_conf),
+                create_pckg({
+                    name = "sqls",
+                    config = {
+                        on_attach = function(client, _)
+                            capabilities = capabilities
+                            client.server_capabilities.documentFormattingProvider = false
+                            client.server_capabilities.documentRangeFormattingProvider = false
+                        end,
+                    }
+                }),
+                create_pckg({ name = "cssls", config = ls_default_conf }),
+                create_pckg({ name = "tailwindcss", config = ls_default_conf }),
             }
 
             local get_package_names = function(ls_list)
