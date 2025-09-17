@@ -7,9 +7,9 @@ return {
         "folke/which-key.nvim", -- FIXME:removing this dependency breaks which-key plugin
     },
     keys = {
-        { '<leader>sl', '<cmd>SessionSearch<CR>',         desc = 'Session search' },
-        { '<leader>ss', '<cmd>SessionSave<CR>',           desc = 'Save session' },
-        { '<leader>st', '<cmd>SessionToggleAutoSave<CR>', desc = 'Toggle autosave' },
+        { '<leader>sl', '<cmd>AutoSession search<CR>', desc = 'Session search' },
+        { '<leader>ss', '<cmd>AutoSession save<CR>',   desc = 'Save session' },
+        { '<leader>st', '<cmd>AutoSession toggle<CR>', desc = 'Toggle autosave' },
     },
     opts = {
         -- fixes missing localoptions at https://github.com/rmagatti/auto-session/issues/369
