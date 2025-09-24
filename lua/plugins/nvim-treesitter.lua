@@ -11,23 +11,39 @@ return {
                 -- scripting
                 "lua", "bash", "python", "vim",
 
-                -- java projects
+                -- -- java projects
                 -- "java", "groovy", "sql", "properties",
 
-                -- web
-                -- "html", "xml", "typescript", "javascript",
+                -- -- web
+                -- "html", "xml", "typescript", "javascript", "tsx", "jsx",
 
-                -- docs
+                -- -- docs
                 -- "vimdoc", "markdown", "gitignore", "gitcommit",
 
-                -- configurations
+                -- -- configurations
                 -- "tmux", "ini", "yaml", "toml",
             },
             highlight = { enable = true },
             indent = { enable = true },
+            matchup = { enable = true }, -- Enable vim-matchup integration
+
+            --- Install parsers on-demand when opening files. Replaces unreliable auto_install.
             function()
-                -- vim.wo.foldmethod = 'expr'
-                -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+                vim.api.nvim_create_autocmd("BufEnter", {
+                    callback = function()
+                        local ft = vim.bo.filetype
+                        if not ft then return end
+
+                        local parsers = require("nvim-treesitter.parsers")
+                        local parser = parsers.filetype_to_parsername[ft]
+                        if not parser then return end
+
+                        local is_installed = parsers.has_parser(parsers.ft_to_lang(ft))
+                        if not is_installed then
+                            vim.cmd("TSInstall " .. parser)
+                        end
+                    end,
+                })
             end
         },
     }
