@@ -30,7 +30,5 @@ opt.shiftround     = true
 opt.expandtab      = true
 
 -- spellcheck
-opt.spelllang      = { 'en_us', 'en_gb', 'cs' ,'cjk' }
+opt.spelllang      = { 'en_us', 'en_gb', 'cs', 'cjk' }
 opt.spell          = true
-
-

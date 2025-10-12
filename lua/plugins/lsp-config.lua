@@ -128,17 +128,10 @@ return
     },
     {
         "neovim/nvim-lspconfig", -- https://github.com/neovim/nvim-lspconfig
-        -- dependencies = { "folke/neoconf.nvim", },
-
         -- config fun. used by lazy-nvim to setup plugins
         config = function()
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             capabilities.textDocument.completion.completionItem.snippetSupport = true
-            -- enhanced folding with "nvim-ufo"
-            -- capabilities.textDocument.foldingRange = {
-            --     dynamicRegistration = false,
-            --     lineFoldingOnly = true
-            -- }
             local lspconfig = vim.lsp.config
             vim_api.nvim_create_autocmd("LspAttach", {
                 group = Lsp_augrp,
@@ -190,7 +183,6 @@ return
 
                     whichkey_groups()
                     local keymap = vim.keymap
-                    -- keymap.set("n", "<leader>gri", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
                     keymap.set("n", "<leader>gri", vim.lsp.buf.implementation, { desc = "implementation" })
                     -- keymap.set({ "n", "v" }, "<leader>gf", vim.lsp.buf.format, { desc = "format" })
                     keymap.set({ "n", "v" }, "<leader>gf", function() format_with_notification(event.buf) end,
@@ -233,9 +225,6 @@ return
                     end
 
                     keymap.set('n', '<leader>td', togle_diagnostics, { desc = "disgnostic toogle" })
-
-                    -- TODO: reference highlighting
-                    -- vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.lsp.buf.document_highlight(nil, {focus=false, scope="cursor"})]]
                 end
             })
 
@@ -391,7 +380,6 @@ return
         enabled = true,
         event = "VeryLazy",
         opts = {},
-        -- config = function(_, opts) require "lsp_signature".setup(opts) end,
     },
     {
         "nvimtools/none-ls.nvim", -- Provides hook for non-LSP tools to hook into its LSP client (linters, formatters, ...)

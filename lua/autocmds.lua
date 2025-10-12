@@ -166,8 +166,6 @@ local function autosave(save_interval, exit_wait_time)
     })
 end
 
--- TODO: terminal enable "normal" mode by Esc
-
 --- Shows formatters used when formatting current buffer
 local function show_formatters()
     vim.api.nvim_create_user_command('ListFormatters', function()
