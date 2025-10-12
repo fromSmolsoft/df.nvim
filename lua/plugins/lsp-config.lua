@@ -139,7 +139,7 @@ return
             --     dynamicRegistration = false,
             --     lineFoldingOnly = true
             -- }
-            local lspconfig = require("lspconfig")
+            local lspconfig = vim.lsp.config
             vim_api.nvim_create_autocmd("LspAttach", {
                 group = Lsp_augrp,
                 desc = "Lsp Actions",
@@ -371,10 +371,15 @@ return
             ---Batch call setup_ls()
             ---@param ls_list table list of mason_packages e.g. `packages = { item_1 = {name = "name", config = {}}, item_2..., item_3.., .... }`
             local setup_ls_in_batch = function(ls_list)
+                local severity_names = {}
                 for _, value in pairs(ls_list) do
                     local name, conf = value.name, value.configuration
-                    if conf == true or next(conf) ~= nil then lspconfig[name].setup(conf) end
+                    if conf == true or next(conf) ~= nil then
+                        vim.lsp.config(name, conf)
+                        table.insert(severity_names, name)
+                    end
                 end
+                if #severity_names > 0 then vim.lsp.enable(severity_names) end
             end
             local package_names = get_package_names(lsps)
             install_mason_packages(get_missing_packages(package_names))
