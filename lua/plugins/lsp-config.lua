@@ -197,7 +197,6 @@ return
         config = function()
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             capabilities.textDocument.completion.completionItem.snippetSupport = true
-            local lspconfig = vim.lsp.config
             vim_api.nvim_create_autocmd("LspAttach", {
                 group = Lsp_augrp,
                 desc = "Lsp Actions",
@@ -224,7 +223,7 @@ return
                         local formatting_clients = {}
 
                         for _, client in pairs(clients) do
-                            if client.supports_method("textDocument/formatting") then
+                            if client:supports_method("textDocument/formatting", bufnr) then
                                 table.insert(formatting_clients, client.name)
                             end
                         end
