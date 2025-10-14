@@ -94,6 +94,71 @@ local function install_mason_packages(packages)
     end
 end
 
+-- Intelligent goto to either definition, implementation or references in this order.
+local function intelligent_goto()
+    local clients = vim.lsp.get_clients({ bufnr = 0 })
+    if #clients == 0 then print("No LSP client attached") return
+    end
+
+    local client = clients[1]
+    local offset_encoding = client.offset_encoding or 'utf-16'
+    local params = vim.lsp.util.make_position_params(0, offset_encoding)
+    local word_under_cursor = vim.fn.expand('<cword>')
+
+    -- Function to check if we're at a definition location
+    local function is_at_definition(locations)
+        local current_uri = vim.uri_from_bufnr(0)
+        local current_pos = vim.api.nvim_win_get_cursor(0)
+
+        for _, location in ipairs(locations) do
+            local uri = location.uri or location.targetUri
+            local range = location.range or location.targetRange or location.range
+
+            if uri == current_uri then
+                local start_line = range.start.line + 1
+                local start_char = range.start.character
+                local end_char = range['end'].character
+
+                if start_line == current_pos[1] and
+                    current_pos[2] >= start_char and
+                    current_pos[2] <= end_char then
+                    return true
+                end
+            end
+        end
+        return false
+    end
+
+    -- Try definition first
+    vim.lsp.buf_request(0, 'textDocument/definition', params, function(err, result, ctx)
+        if not err and result and not vim.tbl_isempty(result) then
+            local locations = vim.islist(result) and result or { result }
+
+            if is_at_definition(locations) then
+                -- We're at definition, show references
+                print("At definition, showing references for: " .. word_under_cursor)
+                vim.lsp.buf.references()
+            else
+                -- Not at definition, go to definition
+                print("Going to definition of: " .. word_under_cursor)
+                vim.lsp.buf.definition()
+            end
+        else
+            -- No definition, try implementation
+            vim.lsp.buf_request(0, 'textDocument/implementation', params, function(impl_err, impl_result)
+                if not impl_err and impl_result and not vim.tbl_isempty(impl_result) then
+                    print("Going to implementation of: " .. word_under_cursor)
+                    vim.lsp.buf.implementation()
+                else
+                    -- Fall back to references
+                    print("Showing references for: " .. word_under_cursor)
+                    vim.lsp.buf.references()
+                end
+            end)
+        end
+    end)
+end
+
 -- plugins
 return
 {
@@ -189,6 +254,7 @@ return
                         { desc = "format", buffer = event.buf })
                     keymap.set("n", "K", vim.lsp.buf.hover, { desc = "hover" })
                     keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "definition" })
+                    keymap.set("n", "<leader>grt", intelligent_goto, { desc = 'Intelligent goto (definition/references)' })
                     keymap.set("n", "<leader>grr", vim.lsp.buf.references, { desc = "reference" })
                     keymap.set("n", "<leader>grn", vim.lsp.buf.rename, { desc = "rename" })
                     keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "actions" })
