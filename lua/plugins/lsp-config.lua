@@ -442,9 +442,22 @@ return
     },
     {
         "ray-x/lsp_signature.nvim", -- Show doc strings upon hover
-        enabled = true,
-        event = "VeryLazy",
-        opts = {},
+        -- enabled = true,
+        event = "InsertEnter",
+        opts = {
+            bind = true,
+            handlers_opts = {
+                border = "rounded"
+            },
+            -- FIX: disable second signatureHelp caused by vim.lsp
+            on_attach = function(client, bufnr)
+                -- Disable Neovim’s built-in signatureHelp handler
+                vim.lsp.handlers["textDocument/signatureHelp"] = function(err, result, ctx, config)
+                    -- forward to lsp_signature’s handler instead of the native one
+                    require("lsp_signature.impl").signature_help_handler(err, result, ctx, config)
+                end
+            end,
+        },
     },
     {
         "nvimtools/none-ls.nvim", -- Provides hook for non-LSP tools to hook into its LSP client (linters, formatters, ...)
