@@ -3,6 +3,7 @@ ASCII
 Alacritty
 CZK
 Exafunction
+FIX:
 Initializr
 JDTLS
 JSON
@@ -25,11 +26,12 @@ lsp_signature
 lua
 luasnip
 nvim
+openJDK
 pacman
 param
+puml
 pyright
 server-side
 taplo
 toml
-openJDK
-puml
+WARN:
